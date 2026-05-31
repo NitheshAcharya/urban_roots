@@ -1,0 +1,249 @@
+.checkout-page {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 20px 0;
+}
+
+.checkout-page.success-state,
+.checkout-page.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  height: 60vh;
+  gap: 20px;
+}
+
+.checkout-page.success-state h2 {
+  color: var(--color-green);
+  font-size: 2rem;
+}
+
+.checkout-container {
+  display: flex;
+  gap: 40px;
+  margin-top: 20px;
+}
+
+.checkout-left {
+  flex: 3;
+  background: var(--color-white);
+  padding: 30px;
+  border-radius: var(--radius-lg);
+  border: 1.5px solid var(--color-sand);
+}
+
+.checkout-right {
+  flex: 2;
+  background: var(--color-cream);
+  padding: 30px;
+  border-radius: var(--radius-lg);
+  display: flex;
+  flex-direction: column;
+}
+
+.payment-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-group label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-gray-dark);
+}
+
+.form-group input {
+  padding: 12px 14px;
+  border: 1.5px solid var(--color-sand);
+  border-radius: var(--radius-sm);
+  font-size: 16px;
+  outline: none;
+  font-family: var(--font-body);
+}
+
+.form-group input:focus {
+  border-color: var(--color-green);
+}
+
+.card-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.card-icon {
+  position: absolute;
+  left: 14px;
+  color: var(--color-gray-dark);
+}
+
+.card-input-wrapper input {
+  padding-left: 40px;
+  width: 100%;
+}
+
+.form-row {
+  display: flex;
+  gap: 20px;
+}
+
+.form-row .form-group {
+  flex: 1;
+}
+
+.pay-btn {
+  background: var(--color-green);
+  color: var(--color-white);
+  padding: 16px;
+  border-radius: var(--radius-md);
+  font-size: 18px;
+  font-weight: 600;
+  margin-top: 10px;
+  transition: var(--transition);
+}
+
+.pay-btn:hover:not(:disabled) {
+  background: var(--color-green-dark);
+}
+
+.pay-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.order-items {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-height: 300px;
+  overflow-y: auto;
+  margin-top: 20px;
+  padding-right: 10px;
+}
+
+.order-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.item-icon {
+  width: 48px;
+  height: 48px;
+  background: var(--color-white);
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+}
+
+.item-details {
+  flex: 1;
+}
+
+.item-details h4 {
+  margin: 0;
+  font-size: 15px;
+}
+
+.item-details p {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: var(--color-gray-dark);
+}
+
+.item-price {
+  font-weight: 600;
+}
+
+.coupon-section {
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid rgba(0,0,0,0.05);
+}
+
+.coupon-input-group {
+  display: flex;
+  align-items: center;
+  background: var(--color-white);
+  border-radius: var(--radius-sm);
+  padding: 4px;
+  border: 1.5px solid var(--color-sand);
+}
+
+.coupon-input-group svg {
+  margin: 0 10px;
+  color: var(--color-gray-dark);
+}
+
+.coupon-input-group input {
+  flex: 1;
+  border: none;
+  outline: none;
+  padding: 8px 0;
+  font-family: var(--font-body);
+}
+
+.coupon-input-group button {
+  background: var(--color-brown);
+  color: var(--color-white);
+  padding: 8px 16px;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+}
+
+.coupon-msg {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  margin-top: 8px;
+}
+
+.coupon-msg.success { color: var(--color-green); }
+.coupon-msg.error { color: var(--color-red); }
+
+.summary-totals {
+  margin-top: auto;
+  padding-top: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  color: var(--color-gray-dark);
+  font-size: 15px;
+}
+
+.summary-row.discount {
+  color: var(--color-green);
+}
+
+.summary-row.total {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--color-brown);
+  margin-top: 8px;
+  padding-top: 16px;
+  border-top: 1.5px dashed var(--color-sand);
+}
+
+@media (max-width: 768px) {
+  .checkout-container {
+    flex-direction: column-reverse;
+  }
+}

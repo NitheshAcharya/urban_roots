@@ -1,0 +1,531 @@
+.encyclopedia {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+/* Encyclopedia Hero Section */
+.encyclopedia-hero {
+  background: linear-gradient(135deg, var(--color-bg-secondary) 0%, rgba(46, 213, 115, 0.08) 100%);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 56px 24px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 10px 30px var(--color-shadow);
+}
+
+.encyclopedia-title {
+  font-size: 40px;
+  font-weight: 800;
+  margin-bottom: 8px;
+  background: linear-gradient(135deg, var(--color-text-primary) 30%, var(--color-primary) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: -0.5px;
+}
+
+.encyclopedia-subtitle {
+  font-size: 15px;
+  color: var(--color-text-secondary);
+  max-width: 600px;
+  margin-bottom: 32px;
+  font-weight: 500;
+}
+
+.search-bar-container {
+  position: relative;
+  width: 100%;
+  max-width: 600px;
+}
+
+.search-icon {
+  position: absolute;
+  left: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--color-text-secondary);
+}
+
+.search-input {
+  width: 100%;
+  padding: 16px 52px 16px 52px;
+  border-radius: var(--radius-full);
+  border: 1.5px solid var(--color-border);
+  background-color: var(--color-input-bg);
+  color: var(--color-text-primary);
+  font-size: 16px;
+  font-family: inherit;
+  box-shadow: 0 4px 20px var(--color-shadow);
+  outline: none;
+  transition: var(--transition);
+}
+
+.search-input:focus {
+  border-color: var(--color-primary);
+  box-shadow: var(--glow-green);
+}
+
+.clear-search-btn {
+  position: absolute;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--color-text-secondary);
+}
+
+.clear-search-btn:hover {
+  color: var(--color-accent-red);
+}
+
+/* Suggestion dropdown popover */
+.search-suggestions-box {
+  position: absolute;
+  top: 60px;
+  left: 0;
+  width: 100%;
+  z-index: 110;
+  padding: 10px;
+  text-align: left;
+}
+
+.suggestion-item-row {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.suggestion-item-row:hover {
+  background-color: var(--color-primary-light);
+}
+
+.suggestion-emoji {
+  font-size: 24px;
+  margin-right: 12px;
+}
+
+.suggestion-details {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.suggestion-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.suggestion-sc {
+  font-size: 11px;
+  color: var(--color-text-secondary);
+  font-style: italic;
+}
+
+.suggestion-method {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-primary);
+  background-color: var(--color-primary-light);
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+}
+
+/* Filters Section with Labels */
+.filters-section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  background-color: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  padding: 20px 24px;
+  border-radius: var(--radius-lg);
+}
+
+.filter-group {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.filter-label {
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+  letter-spacing: 0.5px;
+  width: 120px;
+  flex-shrink: 0;
+}
+
+.filter-pills {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+.filter-tab-pill {
+  padding: 8px 16px;
+  background-color: var(--color-input-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+}
+
+.filter-tab-pill:hover {
+  border-color: var(--color-primary);
+  color: var(--color-text-primary);
+}
+
+.filter-tab-pill.active {
+  background-color: var(--color-primary);
+  color: var(--color-white);
+  border-color: var(--color-primary);
+  box-shadow: var(--glow-green);
+}
+
+.filter-tab-pill.system.active {
+  background-color: var(--color-accent-blue);
+  border-color: var(--color-accent-blue);
+  box-shadow: var(--glow-blue);
+}
+
+/* Grid & Cards */
+.encyclopedia-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+  gap: 24px;
+}
+
+.plant-grid-card-v2 {
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+  overflow: hidden;
+  height: 100%;
+}
+
+.card-image-wrapper {
+  height: 170px;
+  position: relative;
+  overflow: hidden;
+  background-color: var(--color-border);
+}
+
+.card-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.plant-grid-card-v2:hover .card-image {
+  transform: scale(1.05);
+}
+
+.card-emoji-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 64px;
+}
+
+.card-water-badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background-color: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  padding: 4px 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--color-accent-blue);
+}
+
+.difficulty-indicator {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+}
+
+.difficulty-indicator.diff-easy { background-color: var(--color-primary-light); color: var(--color-primary); }
+.difficulty-indicator.diff-medium { background-color: var(--color-accent-yellow-light); color: var(--color-accent-yellow); }
+.difficulty-indicator.diff-hard { background-color: var(--color-accent-red-light); color: var(--color-accent-red); }
+
+.card-body {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.card-title {
+  font-size: 19px;
+  font-weight: 700;
+  margin-bottom: 2px;
+}
+
+.card-scientific {
+  font-size: 12px;
+  font-style: italic;
+  color: var(--color-text-secondary);
+  margin-bottom: 12px;
+}
+
+.card-suitability-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.suitability-tag {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.suitability-tag.hydro { background-color: var(--color-primary-light); color: var(--color-primary); }
+.suitability-tag.vertical { background-color: var(--color-accent-blue-light); color: var(--color-accent-blue); }
+
+.card-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 16px;
+  border-top: 1px solid var(--color-border);
+  padding-top: 14px;
+}
+
+.metric-cell {
+  background-color: var(--color-input-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.metric-cell span {
+  font-weight: 700;
+  color: var(--color-text-primary);
+  font-size: 11px;
+}
+
+.card-footer-action {
+  margin-top: auto;
+  border-top: 1px solid var(--color-border);
+  padding-top: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.media-tag {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.action-button-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.suggest-correction-btn {
+  color: var(--color-text-secondary);
+  background-color: var(--color-input-bg);
+  border: 1px solid var(--color-border);
+  padding: 6px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.suggest-correction-btn:hover {
+  border-color: var(--color-accent-yellow);
+  color: var(--color-accent-yellow);
+}
+
+.action-link {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+.plant-grid-card-v2:hover .action-link {
+  text-decoration: underline;
+}
+
+/* No Results card */
+.no-results-box {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 48px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.no-results-emoji {
+  font-size: 56px;
+  margin-bottom: 16px;
+}
+
+.no-results-box h3 {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.no-results-box p {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+/* Parameter correction modal */
+.close-modal-btn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  color: var(--color-text-secondary);
+}
+
+.close-modal-btn:hover {
+  color: var(--color-text-primary);
+}
+
+.modal-top {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: 16px;
+}
+
+.modal-logo {
+  width: 52px;
+  height: 52px;
+  border-radius: var(--radius-md);
+  background-color: var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+}
+
+.modal-top h2 {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.modal-top p {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+.suggestion-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.form-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-input-group label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+}
+
+.modal-select-field,
+.modal-text-field,
+.modal-textarea-field {
+  width: 100%;
+  padding: 10px 14px;
+  background-color: var(--color-input-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--color-text-primary);
+  font-family: inherit;
+  font-size: 14px;
+  outline: none;
+  transition: var(--transition);
+}
+
+.modal-select-field:focus,
+.modal-text-field:focus,
+.modal-textarea-field:focus {
+  border-color: var(--color-primary);
+}
+
+.modal-confirm-btn {
+  width: 100%;
+  padding: 14px;
+  font-size: 15px;
+  margin-top: 8px;
+}
+
+/* Responsive Filters */
+@media (max-width: 768px) {
+  .filters-section {
+    padding: 16px;
+  }
+  .filter-group {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .filter-label {
+    width: 100%;
+  }
+  .encyclopedia-hero {
+    padding: 36px 16px;
+  }
+  .encyclopedia-title {
+    font-size: 32px;
+  }
+}

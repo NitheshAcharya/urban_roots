@@ -1,0 +1,320 @@
+.yield-calculator-page {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  max-width: 1000px;
+  margin: 0 auto;
+  padding-bottom: 80px;
+}
+
+.calc-header {
+  text-align: center;
+  margin-bottom: 12px;
+}
+
+.calc-header h1 {
+  font-size: 32px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  background: linear-gradient(135deg, var(--color-text-primary) 30%, var(--color-primary) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.calc-header p {
+  font-size: 15px;
+  color: var(--color-text-secondary);
+  font-weight: 500;
+}
+
+/* Split layout */
+.calc-split-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+.calc-inputs-panel,
+.calc-outputs-panel {
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.calc-inputs-panel h3,
+.calc-outputs-panel h3 {
+  font-size: 16px;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: 12px;
+}
+
+.input-field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.field-label-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.field-label-row label {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.field-badge {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  background-color: var(--color-primary-light);
+  color: var(--color-primary);
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.field-badge.value {
+  background-color: var(--color-accent-blue-light);
+  color: var(--color-accent-blue);
+}
+
+.calc-select {
+  width: 100%;
+  padding: 12px;
+  background-color: var(--color-input-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--color-text-primary);
+  font-family: inherit;
+  font-size: 14px;
+  outline: none;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.calc-select:focus {
+  border-color: var(--color-primary);
+}
+
+.calc-slider {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 6px;
+  border-radius: var(--radius-full);
+  background: var(--color-border);
+  outline: none;
+}
+
+.calc-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  cursor: pointer;
+  box-shadow: var(--glow-green);
+  transition: var(--transition);
+}
+
+.calc-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+}
+
+.slider-limits {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+
+.section-sub-label {
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+}
+
+/* Plant Selector Grid */
+.plants-selector-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.calc-plant-chip {
+  padding: 10px;
+  border: 1.5px solid var(--color-border);
+  background-color: var(--color-input-bg);
+  border-radius: var(--radius-md);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  text-align: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--color-text-secondary);
+  transition: var(--transition);
+}
+
+.calc-plant-chip:hover {
+  border-color: var(--color-primary);
+  color: var(--color-text-primary);
+}
+
+.calc-plant-chip.selected {
+  border-color: var(--color-primary);
+  background-color: var(--color-primary-light);
+  color: var(--color-primary);
+}
+
+.chip-emoji {
+  font-size: 20px;
+}
+
+/* Outputs Panel */
+.outputs-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.eco-score-circle-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.eco-radial-svg {
+  transform: rotate(-90deg);
+  overflow: visible;
+}
+
+.ring-fill {
+  transition: stroke-dasharray 0.5s ease;
+}
+
+.score-text {
+  font-size: 11px;
+  font-weight: 800;
+  fill: var(--color-text-primary);
+  text-anchor: middle;
+  transform: rotate(90deg);
+  transform-origin: 18px 18px;
+}
+
+.eco-score-circle-wrapper small {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+}
+
+/* Metrics outputs grid */
+.impact-results-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.impact-result-card {
+  background-color: var(--color-input-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.impact-result-card small {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+  display: block;
+}
+
+.impact-result-card h4 {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+/* Financial savings block */
+.financial-yield-summary {
+  background-color: var(--color-input-bg);
+  border: 1px solid var(--color-border);
+  padding: 20px;
+  border-radius: var(--radius-md);
+  text-align: center;
+}
+
+.financial-label {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+  margin-bottom: 6px;
+}
+
+.financial-value {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--color-primary);
+  font-family: var(--font-heading);
+}
+
+.financial-subtext {
+  font-size: 11px;
+  color: var(--color-text-secondary);
+  margin: 4px 0 0 0;
+  font-weight: 600;
+}
+
+.calc-alert-banner {
+  padding: 12px 16px;
+  background-color: var(--color-primary-light);
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.calc-alert-banner svg {
+  color: var(--color-primary);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.calc-alert-banner p {
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+  margin: 0;
+  font-weight: 600;
+}
+
+.share-calc-btn {
+  width: 100%;
+  padding: 12px;
+}
+
+@media (max-width: 768px) {
+  .calc-split-layout {
+    grid-template-columns: 1fr;
+  }
+}

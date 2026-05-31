@@ -1,0 +1,146 @@
+.gamification-toast-container {
+  position: fixed;
+  top: 80px;
+  right: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  z-index: 9999;
+  max-width: 350px;
+  pointer-events: none;
+}
+
+.gamification-toast {
+  pointer-events: auto;
+  display: flex;
+  align-items: flex-start;
+  padding: 16px 20px;
+  border-radius: var(--radius-md);
+  border: 1.5px solid var(--color-border);
+  box-shadow: 0 10px 30px var(--color-shadow);
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  animation: slide-in-toast 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  transition: all 0.3s ease;
+}
+
+.gamification-toast:hover {
+  transform: translateY(-2px);
+}
+
+@keyframes slide-in-toast {
+  0% { transform: translateX(120%); opacity: 0; }
+  100% { transform: translateX(0); opacity: 1; }
+}
+
+.toast-close-btn {
+  background: none;
+  border: none;
+  color: var(--color-text-secondary);
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0;
+  margin-left: 12px;
+  margin-top: -4px;
+  flex-shrink: 0;
+}
+
+.toast-close-btn:hover {
+  color: var(--color-text-primary);
+}
+
+.toast-content-wrapper {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.toast-icon-box {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.toast-icon-box.xp {
+  background-color: var(--color-primary-light);
+  color: var(--color-primary);
+}
+
+.toast-icon-box.badge {
+  background-color: rgba(241, 196, 15, 0.15);
+  border: 1px solid rgba(241, 196, 15, 0.3);
+}
+
+.toast-emoji-badge {
+  font-size: 20px;
+}
+
+.toast-text-box {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.toast-title {
+  font-size: 14px;
+  font-weight: 800;
+  margin: 0;
+}
+
+.toast-title.text-green { color: var(--color-primary); }
+.toast-title.text-yellow { color: #f0932b; }
+
+.toast-subtitle {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  line-height: 1.4;
+  margin: 0;
+  font-weight: 500;
+}
+
+/* Level Up styling */
+.level-up-toast {
+  border-color: #f1c40f !important;
+  background: linear-gradient(135deg, var(--color-card-bg) 0%, rgba(241, 196, 15, 0.05) 100%) !important;
+  box-shadow: 0 10px 30px rgba(241, 196, 15, 0.15) !important;
+}
+
+.level-up-notice {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background-color: rgba(241, 196, 15, 0.15);
+  border: 1px solid rgba(241, 196, 15, 0.3);
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
+  font-size: 11px;
+  margin-top: 6px;
+}
+
+.level-up-notice strong {
+  color: #d4ac0d;
+}
+
+.animate-spin-slow {
+  animation: spin 6s linear infinite;
+}
+
+@keyframes spin {
+  100% { transform: rotate(360deg); }
+}
+
+@media (max-width: 480px) {
+  .gamification-toast-container {
+    right: 16px;
+    left: 16px;
+    max-width: none;
+    top: auto;
+    bottom: 80px; /* Sit nicely above the mobile bottom bar */
+  }
+}

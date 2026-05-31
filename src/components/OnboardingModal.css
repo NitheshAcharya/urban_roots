@@ -1,0 +1,208 @@
+.onboarding-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 24px;
+}
+
+.onboarding-modal {
+  background-color: var(--color-bg-secondary);
+  border: 1px solid var(--color-card-border);
+  border-radius: var(--radius-lg);
+  width: 100%;
+  max-width: 500px;
+  min-height: 420px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+}
+
+.onboarding-close {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  color: var(--color-text-secondary);
+  z-index: 20;
+}
+
+.onboarding-close:hover {
+  color: var(--color-text-primary);
+}
+
+.onboarding-progress {
+  height: 6px;
+  background-color: var(--color-border);
+  width: 100%;
+}
+
+.progress-bar {
+  height: 100%;
+  background-color: var(--color-primary);
+  box-shadow: var(--glow-green);
+  transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.onboarding-content {
+  padding: 40px;
+  text-align: center;
+}
+
+.step-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  animation: fade-in-bottom 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.step-emoji {
+  font-size: 48px;
+  margin-bottom: 20px;
+  display: inline-block;
+  filter: drop-shadow(0 4px 10px var(--color-shadow-lg));
+}
+
+.step-content h2 {
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--color-text-primary);
+  margin-bottom: 12px;
+  letter-spacing: -0.5px;
+}
+
+.step-content p {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  margin-bottom: 28px;
+  font-weight: 500;
+}
+
+.onboarding-input {
+  width: 100%;
+  padding: 14px 20px;
+  background-color: var(--color-input-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--color-text-primary);
+  font-size: 16px;
+  margin-bottom: 28px;
+  outline: none;
+  font-family: inherit;
+  transition: var(--transition);
+}
+
+.onboarding-input:focus {
+  border-color: var(--color-primary);
+  box-shadow: var(--glow-green);
+}
+
+.options-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  width: 100%;
+  margin-bottom: 28px;
+}
+
+.option-btn {
+  padding: 16px;
+  border: 1px solid var(--color-border);
+  background-color: var(--color-input-bg);
+  border-radius: var(--radius-md);
+  font-weight: 700;
+  color: var(--color-text-secondary);
+  transition: var(--transition);
+}
+
+.option-btn:hover {
+  border-color: var(--color-primary);
+  color: var(--color-text-primary);
+}
+
+.option-btn.selected {
+  border-color: var(--color-primary);
+  background-color: var(--color-primary-light);
+  color: var(--color-primary);
+  box-shadow: var(--glow-green);
+}
+
+.plants-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 12px;
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+.plant-option {
+  padding: 20px 10px;
+  border: 1px solid var(--color-border);
+  background-color: var(--color-input-bg);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: var(--transition);
+  position: relative;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-text-secondary);
+}
+
+.plant-option:hover {
+  border-color: var(--color-primary);
+  color: var(--color-text-primary);
+}
+
+.plant-option.selected {
+  border-color: var(--color-primary);
+  background-color: var(--color-primary-light);
+  color: var(--color-primary);
+}
+
+.check-badge {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  width: 22px;
+  height: 22px;
+  background-color: var(--color-primary);
+  color: var(--color-white);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--glow-green);
+  border: 2px solid var(--color-bg-secondary);
+}
+
+.selection-count {
+  font-size: 12px !important;
+  color: var(--color-text-secondary) !important;
+  margin-bottom: 28px !important;
+  font-weight: 700;
+}
+
+.final-btn {
+  margin-top: 16px;
+  width: 100%;
+}
+
+.btn-primary:disabled {
+  background: var(--color-border) !important;
+  color: var(--color-text-secondary) !important;
+  box-shadow: none !important;
+  cursor: not-allowed;
+  transform: none;
+}
+
+@media (max-width: 480px) {
+  .onboarding-content {
+    padding: 30px 20px;
+  }
+}
