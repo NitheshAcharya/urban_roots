@@ -18,6 +18,9 @@ dist-ssr
 .env.production
 backend/.env
 
+# Old Express backend (now converted to api/ serverless functions)
+backend/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
