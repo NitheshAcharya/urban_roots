@@ -1,0 +1,5 @@
+backend/
+*.sql
+*.cjs
+scratch.cjs
+PROJECT_REPORT.md
