@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { 
   BookOpen, Stethoscope, ShoppingBag, UserPlus, Droplets, Wind, 
   ThermometerSun, Plus, X, Check, MessageSquare, ShieldAlert,
-  Flame, LineChart, Award, Zap, Compass, Calendar, Gift
+  Flame, LineChart, Award, Zap, Compass, Calendar, Gift, RefreshCw
 } from 'lucide-react';
 import { supabase } from '../utils/supabase';
 import { useAuth } from '../context/AuthContext';
@@ -11,10 +11,36 @@ import { plantsData } from '../data/plantsData';
 import { awardXP, unlockBadge, updateStreak } from '../utils/gamification';
 import './Dashboard.css';
 
+const BACKEND_URL = typeof window !== 'undefined' && 
+  (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+  ? (import.meta.env.VITE_BACKEND_URL || '')
+  : '';
+
+const CITY_COORDINATES = {
+  bangalore: { lat: 12.9716, lon: 77.5946, name: 'Bangalore' },
+  bengaluru: { lat: 12.9716, lon: 77.5946, name: 'Bengaluru' },
+  mangalore: { lat: 12.9141, lon: 74.8560, name: 'Mangalore' },
+  mangaluru: { lat: 12.9141, lon: 74.8560, name: 'Mangaluru' },
+  puttur: { lat: 12.7248, lon: 75.2071, name: 'Puttur' },
+  mysore: { lat: 12.2958, lon: 76.6394, name: 'Mysore' },
+  mysuru: { lat: 12.2958, lon: 76.6394, name: 'Mysuru' },
+  hubli: { lat: 15.3647, lon: 75.1240, name: 'Hubli' },
+  hubballi: { lat: 15.3647, lon: 75.1240, name: 'Hubballi' },
+  dharwad: { lat: 15.4589, lon: 75.0078, name: 'Dharwad' },
+  udupi: { lat: 13.3409, lon: 74.7421, name: 'Udupi' },
+  belgaum: { lat: 15.8497, lon: 74.4977, name: 'Belgaum' },
+  belagavi: { lat: 15.8497, lon: 74.4977, name: 'Belagavi' },
+  shimoga: { lat: 13.9299, lon: 75.5681, name: 'Shimoga' },
+  shivamogga: { lat: 13.9299, lon: 75.5681, name: 'Shivamogga' }
+};
+
 const Dashboard = () => {
   const { user, profile, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const [weather, setWeather] = useState({ temp: '--', humidity: '--', wind: '--', isLoading: true });
+  const [resolvedCity, setResolvedCity] = useState('Bangalore');
+  const [locationSource, setLocationSource] = useState('Default');
+  const [showEcoExplanation, setShowEcoExplanation] = useState(false);
   const [myPlants, setMyPlants] = useState([]);
   const [reminders, setReminders] = useState([]);
   const [isLoadingPlants, setIsLoadingPlants] = useState(true);
@@ -61,12 +87,13 @@ const Dashboard = () => {
     setIsGeneratingRecipes(true);
     setRecipeError('');
     try {
-      const res = await fetch(`${import.meta.env.VITE_BACKEND_URL || ''}/api/generate-recipes`, {
+      const res = await fetch(`${BACKEND_URL}/api/generate-recipes`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ingredients: selectedHarvests,
-          quantity: harvestQty
+          harvestQty: harvestQty,
+          recipeCount: 3
         })
       });
 
@@ -172,24 +199,91 @@ const Dashboard = () => {
     }
   };
 
+  // Weather fetch helper
+  const fetchWeather = async () => {
+    setWeather(w => ({ ...w, isLoading: true }));
+    let lat = 12.9716; // default Bangalore
+    let lon = 77.5946;
+    let cityName = 'Bangalore';
+    let source = 'Default';
+
+    // 1. Try Geolocation (GPS) first
+    const getGPSCoords = () => {
+      return new Promise((resolve) => {
+        if (!navigator.geolocation) return resolve(null);
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            resolve({
+              lat: position.coords.latitude,
+              lon: position.coords.longitude
+            });
+          },
+          () => {
+            resolve(null); // denied or error
+          },
+          { timeout: 5000 }
+        );
+      });
+    };
+
+    const gps = await getGPSCoords();
+    if (gps) {
+      lat = gps.lat;
+      lon = gps.lon;
+      source = 'GPS';
+      
+      // Attempt reverse geocoding to get human readable city name
+      try {
+        const geoRes = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=en`);
+        if (geoRes.ok) {
+          const geoData = await geoRes.json();
+          cityName = geoData.city || geoData.locality || geoData.principalSubdivision || 'Current Location';
+        } else {
+          cityName = `Lat: ${lat.toFixed(2)}, Lon: ${lon.toFixed(2)}`;
+        }
+      } catch (err) {
+        cityName = `Lat: ${lat.toFixed(2)}, Lon: ${lon.toFixed(2)}`;
+      }
+    } else {
+      // 2. Try User Profile City fallback
+      const profileCity = profile?.city || 'Bangalore';
+      const cleanCityName = profileCity.trim().toLowerCase();
+      
+      if (CITY_COORDINATES[cleanCityName]) {
+        lat = CITY_COORDINATES[cleanCityName].lat;
+        lon = CITY_COORDINATES[cleanCityName].lon;
+        cityName = CITY_COORDINATES[cleanCityName].name;
+        source = 'Profile';
+      } else {
+        cityName = profileCity;
+        source = 'Profile';
+      }
+    }
+
+    setResolvedCity(cityName);
+    setLocationSource(source);
+
+    // Fetch from Open-Meteo
+    try {
+      const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,wind_speed_10m`);
+      if (!res.ok) throw new Error('Weather API error');
+      const data = await res.json();
+      if (data.current) {
+        setWeather({
+          temp: data.current.temperature_2m,
+          humidity: data.current.relative_humidity_2m,
+          wind: data.current.wind_speed_10m,
+          isLoading: false
+        });
+      }
+    } catch (error) {
+      console.warn('Weather fetch failed, using fallback:', error);
+      setWeather({ temp: '28.4', humidity: '64', wind: '4.2', isLoading: false });
+    }
+  };
+
   // Weather fetch
   useEffect(() => {
-    const fetchWeather = async () => {
-      try {
-        const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=12.9716&longitude=77.5946&current=temperature_2m,relative_humidity_2m,wind_speed_10m');
-        const data = await res.json();
-        if (data.current) {
-          setWeather({
-            temp: data.current.temperature_2m,
-            humidity: data.current.relative_humidity_2m,
-            wind: data.current.wind_speed_10m,
-            isLoading: false
-          });
-        }
-      } catch (error) {
-        setWeather({ temp: '28.4', humidity: '64', wind: '4.2', isLoading: false }); 
-      }
-    };
     
     // Fetch plants
     const fetchPlantsData = async () => {
@@ -260,7 +354,7 @@ const Dashboard = () => {
 
     fetchWeather();
     fetchPlantsData();
-  }, [user, isAuthenticated]);
+  }, [user, isAuthenticated, profile]);
 
   // IoT Sensor fluctuation simulator
   useEffect(() => {
@@ -419,8 +513,30 @@ const Dashboard = () => {
         {/* Weather widget */}
         <div className="glass-card weather-card">
           <div className="weather-header">
-            <h3>{profile?.city || 'Bangalore'}, KA</h3>
-            <span>Live conditions</span>
+            <h3 style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              {resolvedCity}
+              <button 
+                className="location-refresh-btn" 
+                onClick={fetchWeather} 
+                title={`Weather resolved via ${locationSource}. Click to fetch live GPS location.`}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: 'var(--color-primary)',
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  padding: '2px',
+                  borderRadius: '4px',
+                  transition: 'opacity 0.2s'
+                }}
+              >
+                <RefreshCw size={14} className={weather.isLoading ? 'spin-animation' : ''} />
+              </button>
+            </h3>
+            <span style={{ fontSize: '10px', opacity: 0.8, textTransform: 'uppercase', fontWeight: 700 }}>
+              {locationSource === 'GPS' ? '📍 GPS Location' : '🏠 Profile Location'}
+            </span>
           </div>
           <div className="weather-stats">
             <div className="stat">
@@ -501,14 +617,66 @@ const Dashboard = () => {
       </section>
 
       {/* Smart Eco-Savings Panel */}
-      <section className="glass-card eco-savings-hud">
-        <div className="eco-header">
-          <Award size={24} className="eco-icon" />
-          <div>
-            <h3>Your Urban Eco-Impact</h3>
-            <p>Calculated in real time based on your active hydroponic & vertical tower systems</p>
+      <section className="glass-card eco-savings-hud" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <div className="eco-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <Award size={24} className="eco-icon" />
+            <div>
+              <h3>Your Urban Eco-Impact</h3>
+              <p>Calculated in real time based on your active hydroponic & vertical tower systems</p>
+            </div>
           </div>
+          <button 
+            className="eco-info-toggle-btn"
+            onClick={() => setShowEcoExplanation(!showEcoExplanation)}
+            style={{
+              padding: '6px 12px',
+              backgroundColor: 'var(--color-primary-light)',
+              color: 'var(--color-primary)',
+              border: 'none',
+              borderRadius: '20px',
+              fontSize: '12px',
+              fontWeight: '700',
+              cursor: 'pointer',
+              transition: 'all 0.2s',
+              outline: 'none'
+            }}
+          >
+            {showEcoExplanation ? 'Hide Info' : 'How it works?'}
+          </button>
         </div>
+        
+        {showEcoExplanation && (
+          <div className="eco-explanation-panel page-transition" style={{
+            padding: '16px',
+            backgroundColor: 'rgba(255, 255, 255, 0.03)',
+            borderRadius: 'var(--radius-md)',
+            border: '1px solid var(--color-border)',
+            fontSize: '13px',
+            lineHeight: '1.6'
+          }}>
+            <h4 style={{ margin: '0 0 12px 0', color: 'var(--color-primary)', fontWeight: '800' }}>🔬 Science Behind the Eco-Impact Metrics</h4>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                <strong style={{ color: 'var(--color-accent-blue)' }}>💧 Freshwater Saved</strong>
+                <span style={{ fontSize: '12px', color: 'var(--color-text-secondary)' }}>Recirculating hydroponic loops and vertical towers reuse water continuously, reducing water consumption by 85-95% compared to traditional soil rows (saving approx. 8.5 liters per plant per day).</span>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                <strong style={{ color: 'var(--color-primary)' }}>📐 Space Optimization</strong>
+                <span style={{ fontSize: '12px', color: 'var(--color-text-secondary)' }}>Vertical systems stack plants in vertical growth slots, achieving 8x higher cultivation density per square meter compared to traditional flat ground spaces.</span>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                <strong style={{ color: 'var(--color-accent-yellow)' }}>🏆 Eco-Impact Rating</strong>
+                <span style={{ fontSize: '12px', color: 'var(--color-text-secondary)' }}>Calculated based on your number of active soil-less systems: A+ (3+ systems), A (1-2 systems), B (no active systems).</span>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                <strong style={{ color: 'var(--color-accent-purple)' }}>💜 Carbon Offset (CO₂)</strong>
+                <span style={{ fontSize: '12px', color: 'var(--color-text-secondary)' }}>By growing your food hyper-locally on your balcony or terrace, you eliminate carbon footprint from transport logistics, cold chains, and plastic packaging (estimated at 0.05 kg CO₂ offset per liter of water optimized).</span>
+              </div>
+            </div>
+          </div>
+        )}
+
         <div className="eco-stats-row">
           <div className="eco-stat-item">
             <span className="eco-num text-blue">{waterSavedLiters} L</span>
@@ -672,6 +840,37 @@ const Dashboard = () => {
               </button>
             </div>
           ))}
+          
+          <div 
+            className="glass-card plant-card add-plant-card-dashed" 
+            onClick={() => {
+              setShowAddPlant(true);
+              setTimeout(() => {
+                document.querySelector('.add-plant-form')?.scrollIntoView({ behavior: 'smooth' });
+              }, 100);
+            }}
+            style={{ 
+              border: '2px dashed var(--color-border)', 
+              display: 'flex', 
+              flexDirection: 'column', 
+              justifyContent: 'center', 
+              alignItems: 'center', 
+              padding: '24px', 
+              cursor: 'pointer',
+              minHeight: '170px',
+              textAlign: 'center',
+              background: 'rgba(255, 255, 255, 0.01)',
+              transition: 'all 0.3s'
+            }}
+          >
+            <div className="plant-emoji-bg" style={{ backgroundColor: 'var(--color-primary-light)', color: 'var(--color-primary)' }}>
+              <Plus size={24} />
+            </div>
+            <div className="plant-details" style={{ marginTop: '12px' }}>
+              <h4 className="plant-name" style={{ color: 'var(--color-primary)', fontWeight: '800' }}>Add New Plant</h4>
+              <p style={{ fontSize: '11px', color: 'var(--color-text-secondary)', margin: '4px 0 0 0' }}>Deploy a crop to your hydroponics or vertical system</p>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -750,18 +949,34 @@ const Dashboard = () => {
                     <div className="recipe-section-list">
                       <h5>Ingredients Needed:</h5>
                       <ul>
-                        {recipe.ingredients.map((ing, i) => (
-                          <li key={i}>{ing}</li>
-                        ))}
+                        {Array.isArray(recipe.ingredients) ? (
+                          recipe.ingredients.map((ing, i) => (
+                            <li key={i}>{ing}</li>
+                          ))
+                        ) : typeof recipe.ingredients === 'string' ? (
+                          recipe.ingredients.split(',').map((ing, i) => (
+                            <li key={i}>{ing.trim()}</li>
+                          ))
+                        ) : (
+                          <li>No ingredients listed.</li>
+                        )}
                       </ul>
                     </div>
 
                     <div className="recipe-section-list">
                       <h5>Instructions:</h5>
                       <ol>
-                        {recipe.instructions.map((inst, i) => (
-                          <li key={i}>{inst}</li>
-                        ))}
+                        {Array.isArray(recipe.instructions) ? (
+                          recipe.instructions.map((inst, i) => (
+                            <li key={i}>{inst}</li>
+                          ))
+                        ) : typeof recipe.instructions === 'string' ? (
+                          recipe.instructions.split('\n').filter(line => line.trim()).map((inst, i) => (
+                            <li key={i}>{inst.replace(/^\d+\.\s*/, '')}</li>
+                          ))
+                        ) : (
+                          <li>No instructions provided.</li>
+                        )}
                       </ol>
                     </div>
                   </div>

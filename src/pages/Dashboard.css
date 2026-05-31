@@ -880,3 +880,25 @@ select.add-plant-input {
   }
 }
 
+/* Geolocation spin animation and location styles */
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.spin-animation {
+  animation: spin 1s linear infinite;
+}
+
+.location-refresh-btn:hover {
+  opacity: 0.7;
+  background-color: rgba(46, 213, 115, 0.08) !important;
+}
+
+.add-plant-card-dashed:hover {
+  border-color: var(--color-primary) !important;
+  background: rgba(46, 213, 115, 0.03) !important;
+  transform: translateY(-2px);
+  box-shadow: var(--glow-green);
+}
+

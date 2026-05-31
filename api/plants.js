@@ -8,7 +8,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { userId, plantName, species, wateringFrequencyDays } = req.body;
+    const { userId, plantName, species, wateringFrequencyDays, growMethod } = req.body;
 
     if (!userId || !plantName) {
       return res.status(400).json({ error: 'userId and plantName are required' });
@@ -19,8 +19,9 @@ export default async function handler(req, res) {
         user_id: userId,
         plant_name: plantName,
         species: species || null,
-        watering_frequency_days: wateringFrequencyDays || 3,
+        watering_frequency_days: parseInt(wateringFrequencyDays) || 3,
         last_watered: new Date().toISOString(),
+        grow_method: growMethod || 'Hydroponics',
       },
     ]).select();
 
