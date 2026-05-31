@@ -48,12 +48,44 @@ const TopNav = () => {
   useEffect(() => {
     const fetchNotifications = async () => {
       try {
-        const query = isAuthenticated && user?.id
-          ? supabase.from('user_plants').select('*').eq('user_id', user.id)
-          : supabase.from('user_plants').select('*');
+        if (!isAuthenticated) {
+          // Guest User Alerts
+          setNotifications([
+            { id: 'guest-cta', text: "Sign in to track your crops & tasks 🔐", type: "info", color: "blue" },
+            ...baseNotifications
+          ]);
+          return;
+        }
 
-        const { data, error } = await query;
+        const { data, error } = await supabase
+          .from('user_plants')
+          .select('*')
+          .eq('user_id', user?.id);
+
         if (error) throw error;
+
+        // Check if user has bookings as well
+        let userBookings = [];
+        try {
+          if (user?.id) {
+            const { data: bData } = await supabase
+              .from('bookings')
+              .select('*')
+              .eq('user_id', user.id)
+              .gte('date', new Date().toISOString().split('T')[0])
+              .limit(1);
+            if (bData && bData.length > 0) {
+              userBookings.push({
+                id: `b-${bData[0].id}`,
+                text: `Expert booking with ${bData[0].expert_name} confirmed for ${bData[0].date} 👨‍🌾`,
+                type: 'info',
+                color: 'blue'
+              });
+            }
+          }
+        } catch (errBooking) {
+          console.warn('Booking subquery failed, skipping booking alerts:', errBooking);
+        }
 
         if (data && data.length > 0) {
           const alerts = [];
@@ -84,29 +116,6 @@ const TopNav = () => {
             }
           });
 
-          // Check if user has bookings as well
-          let userBookings = [];
-          try {
-            if (isAuthenticated && user?.id) {
-              const { data: bData } = await supabase
-                .from('bookings')
-                .select('*')
-                .eq('user_id', user.id)
-                .gte('date', new Date().toISOString().split('T')[0])
-                .limit(1);
-              if (bData && bData.length > 0) {
-                userBookings.push({
-                  id: `b-${bData[0].id}`,
-                  text: `Expert booking with ${bData[0].expert_name} confirmed for ${bData[0].date} 👨‍🌾`,
-                  type: 'info',
-                  color: 'blue'
-                });
-              }
-            }
-          } catch (errBooking) {
-            console.warn('Booking subquery failed, skipping booking alerts:', errBooking);
-          }
-
           const combined = [
             ...alerts,
             ...userBookings,
@@ -124,18 +133,17 @@ const TopNav = () => {
 
           setNotifications(combined);
         } else {
-          // Fallback to static mock alerts
+          // Authenticated but has 0 plants!
           setNotifications([
-            { id: 1, text: "Water your Tomato plant — Overdue! 🍅", type: "urgent", color: "red" },
-            { id: 2, text: "Fertilize Tulsi this Friday 🌿", type: "warning", color: "yellow" },
-            ...baseNotifications
+            { id: 'no-plants', text: "No active plants. Deploy a crop to start tracking! 🌿", type: "info", color: "blue" },
+            ...userBookings,
+            ...baseNotifications.filter(b => b.id !== 'n-expert' || userBookings.length === 0)
           ]);
         }
       } catch (err) {
         console.warn('Failed to load navigation alerts:', err);
         setNotifications([
-          { id: 1, text: "Water your Tomato plant — Overdue! 🍅", type: "urgent", color: "red" },
-          { id: 2, text: "Fertilize Tulsi this Friday 🌿", type: "warning", color: "yellow" },
+          { id: 'error-alerts', text: "System connection running slow. Try reloading! ⚡", type: "info", color: "yellow" },
           ...baseNotifications
         ]);
       }

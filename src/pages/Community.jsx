@@ -57,6 +57,41 @@ const mockPosts = [
     isLiked: true,
     isDisliked: false,
     tags: ['VerticalStrawberries', 'SpaceSaving', 'Showcase']
+  },
+  {
+    id: 4,
+    author: 'Anjali Rao',
+    avatar: '👩🏽',
+    city: 'Mangaluru',
+    time: '2 days ago',
+    type: 'tip',
+    content: 'Preventing Mealybugs organically: Wash your Curry Leaf (Karibevu) plant with a mix of cold-pressed Neem Oil (1 tsp), organic liquid dish soap (5 drops), and 1 liter of warm water. Spray at dusk twice a week. Works like magic in coastal Karnataka humidity! 🌿🚿',
+    likes: 56,
+    dislikes: 0,
+    comments: [
+      { id: 1, author: 'Priya Sharma', avatar: '👩🏽‍🌾', text: 'Neem spray is a lifesaver! I add a pinch of baking soda too.', time: '1d ago', likes: 6 }
+    ],
+    isLiked: false,
+    isDisliked: false,
+    tags: ['OrganicPestControl', 'CurryLeaf', 'CoastalGardening']
+  },
+  {
+    id: 5,
+    author: 'Chethan Gowda',
+    avatar: '🧑🏽',
+    city: 'Udupi',
+    time: '3 days ago',
+    type: 'question',
+    content: 'Coriander (Kothambari) hydroponics EC levels: I am trying DWC (Deep Water Culture) for coriander in Udupi\'s hot summer weather. The roots are turning brown and growth has slowed. My water temp is 29°C. What EC/pH should I maintain? Or is it too hot? 🥵🌱',
+    likes: 12,
+    dislikes: 0,
+    comments: [
+      { id: 1, author: 'Karthik Reddy', avatar: '👨🏽‍🔬', text: 'At 29°C, dissolved oxygen is very low, leading to root rot. Try adding an extra air stone and lowering EC to 1.2 to reduce nutrient stress.', time: '2d ago', likes: 4 },
+      { id: 2, author: 'Dr. Ananya', avatar: '👩🏽‍🔬', text: 'Keep pH between 5.8 and 6.2. Lowering root zone temperature (wrapping reservoir in reflective foil) will help immensely.', time: '1d ago', likes: 5 }
+    ],
+    isLiked: false,
+    isDisliked: false,
+    tags: ['CorianderHydro', 'SummerGardening', 'RootZoneTemp']
   }
 ];
 

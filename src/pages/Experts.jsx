@@ -1,21 +1,59 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { MapPin, Star, Calendar as CalendarIcon, Clock, Video, Home, X } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 import './Experts.css';
 
 const expertsData = [
-  { id: 1, name: 'Dr. Ananya Reddy', role: 'Plant Pathologist', emoji: '👩🏽‍🔬', location: 'Bengaluru', rating: 4.9, reviews: 124, tags: ['Disease Diagnosis', 'Indoor'], rate: 499, type: 'Disease Diagnosis' },
-  { id: 2, name: 'Rohan Sharma', role: 'Urban Farming Specialist', emoji: '🧑🏽‍🌾', location: 'Mysuru', rating: 4.8, reviews: 89, tags: ['Setup & Design', 'Vegetables'], rate: 699, type: 'Setup & Design' },
-  { id: 3, name: 'Lakshmi Narayan', role: 'Soil Scientist', emoji: '👩🏽‍🌾', location: 'Mangaluru', rating: 4.7, reviews: 56, tags: ['Soil Testing', 'Fertilizers'], rate: 399, type: 'Soil Testing' },
-  { id: 4, name: 'Vikram Joshi', role: 'Horticulturist', emoji: '👨🏽‍🔬', location: 'Hubballi', rating: 4.9, reviews: 210, tags: ['Online Only', 'Fruits'], rate: 299, type: 'Online Only' },
+  { id: 1, name: 'Dr. Ananya Reddy', role: 'Plant Pathologist', emoji: '👩🏽‍🔬', location: 'Bengaluru', rating: 4.9, reviews: 124, tags: ['Disease Diagnosis', 'Indoor'], baseRate: 399, type: 'Disease Diagnosis' },
+  { id: 2, name: 'Rohan Sharma', role: 'Urban Farming Specialist', emoji: '🧑🏽‍🌾', location: 'Mysuru', rating: 4.8, reviews: 89, tags: ['Setup & Design', 'Vegetables'], baseRate: 599, type: 'Setup & Design' },
+  { id: 3, name: 'Lakshmi Narayan', role: 'Soil Scientist', emoji: '👩🏽‍🌾', location: 'Mangaluru', rating: 4.7, reviews: 56, tags: ['Soil Testing', 'Fertilizers'], baseRate: 299, type: 'Soil Testing' },
+  { id: 4, name: 'Vikram Joshi', role: 'Horticulturist', emoji: '👨🏽‍🔬', location: 'Hubballi', rating: 4.9, reviews: 210, tags: ['Online Only', 'Fruits'], baseRate: 199, type: 'Online Only' },
 ];
 
 const categories = ['All Experts', 'Disease Diagnosis', 'Setup & Design', 'Soil Testing', 'Online Only'];
 
 const Experts = () => {
+  const { user, profile } = useAuth();
   const [activeTab, setActiveTab] = useState('All Experts');
   const [bookingModal, setBookingModal] = useState({ isOpen: false, expert: null });
   const [bookingData, setBookingData] = useState({ date: '', time: '', type: 'online', issue: '' });
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [userCity, setUserCity] = useState('Bengaluru');
+
+  useEffect(() => {
+    if (profile?.city) {
+      setUserCity(profile.city);
+    } else {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          async (position) => {
+            try {
+              const res = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${position.coords.latitude}&longitude=${position.coords.longitude}&localityLanguage=en`);
+              if (res.ok) {
+                const data = await res.json();
+                const city = data.city || data.locality || data.principalSubdivision;
+                if (city) {
+                  setUserCity(city);
+                }
+              }
+            } catch (err) {
+              console.warn('Geolocation lookup failed in Experts:', err);
+            }
+          }
+        );
+      }
+    }
+  }, [profile]);
+
+  const getFinalRate = (expert) => {
+    if (!expert) return { rate: 0, isLocal: false };
+    const isLocal = userCity.toLowerCase().trim().includes(expert.location.toLowerCase().trim()) || 
+                    expert.location.toLowerCase().trim().includes(userCity.toLowerCase().trim());
+    return {
+      rate: isLocal ? expert.baseRate - 100 : expert.baseRate,
+      isLocal
+    };
+  };
 
   const filteredExperts = expertsData.filter(
     exp => activeTab === 'All Experts' || exp.tags.includes(activeTab) || exp.type === activeTab
@@ -82,9 +120,19 @@ const Experts = () => {
             </div>
             
             <div className="expert-footer">
-              <div className="expert-rate">
-                <span className="rate-amount">₹{expert.rate}</span>
-                <span className="rate-session">/ session</span>
+              <div className="expert-rate" style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+                {getFinalRate(expert).isLocal ? (
+                  <>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                       <span className="rate-amount" style={{ color: 'var(--color-primary)' }}>₹{getFinalRate(expert).rate}</span>
+                       <span className="rate-amount-old" style={{ textDecoration: 'line-through', fontSize: '11px', opacity: 0.6 }}>₹{expert.baseRate}</span>
+                    </div>
+                    <span style={{ fontSize: '9px', backgroundColor: 'var(--color-primary-light)', color: 'var(--color-primary)', padding: '1px 6px', borderRadius: '10px', marginTop: '2px', fontWeight: 800 }}>📍 Local Discount (-₹100)</span>
+                  </>
+                ) : (
+                  <span className="rate-amount">₹{expert.baseRate}</span>
+                )}
+                <span className="rate-session" style={{ fontSize: '10px', opacity: 0.8 }}>/ session</span>
               </div>
               <button className="book-btn" onClick={() => openModal(expert)}>Book Now</button>
             </div>
@@ -171,7 +219,7 @@ const Experts = () => {
 
                   <div className="booking-total">
                     <span>Total Amount</span>
-                    <span className="total-price">₹{bookingModal.expert?.rate}</span>
+                    <span className="total-price">₹{getFinalRate(bookingModal.expert).rate}</span>
                   </div>
 
                   <button type="submit" className="confirm-book-btn">Confirm Booking</button>

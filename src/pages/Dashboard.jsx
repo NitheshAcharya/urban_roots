@@ -340,13 +340,21 @@ const Dashboard = () => {
             }));
 
           setReminders([...dynamicReminders, ...doneReminders]);
+        } else if (isAuthenticated) {
+          setMyPlants([]);
+          setReminders([]);
         } else {
           setMyPlants(mockMyPlants);
           setReminders(mockReminders);
         }
       } catch(err) {
-        setMyPlants(mockMyPlants);
-        setReminders(mockReminders);
+        if (isAuthenticated) {
+          setMyPlants([]);
+          setReminders([]);
+        } else {
+          setMyPlants(mockMyPlants);
+          setReminders(mockReminders);
+        }
       } finally {
         setIsLoadingPlants(false);
       }

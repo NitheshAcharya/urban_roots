@@ -15,9 +15,12 @@ const productsData = [
   { id: 6, name: 'Self-Watering Balcony Planter', desc: 'Equipped with wicking indicator ropes and subsurface water level gauges.', emoji: '🪴', cat: 'Pots', price: 449, oldPrice: 599, badge: '', rating: 4.4, reviews: 54, image: 'https://images.unsplash.com/photo-1485955900006-10f4d324d411?auto=format&fit=crop&w=600&q=80' },
   { id: 7, name: 'Vertical Grow Tower (30 Pockets)', desc: 'Modular aeroponic stackable column tower with wicking reservoir pump.', emoji: '🗼', cat: 'Pots', price: 3499, oldPrice: 4999, badge: 'Top Brand', rating: 4.8, reviews: 31, image: 'https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?auto=format&fit=crop&w=600&q=80' },
   { id: 8, name: 'Neem Oil Pest Control Spray 500ml', desc: 'Cold-pressed natural insect repellent. Non-toxic for home organic plants.', emoji: '🌿', cat: 'Fertilizers', price: 129, oldPrice: 179, badge: 'Organic', rating: 4.6, reviews: 93, image: 'https://images.unsplash.com/photo-1581578731548-c64695cc6952?auto=format&fit=crop&w=600&q=80' },
-  { id: 9, name: 'Smart Moisture pH EC Soil Meter', desc: '3-in-1 digital sensor probe for instant substrate parameters verification.', emoji: '🛠️', cat: 'Tools', price: 599, oldPrice: 890, badge: 'Limited Stock', rating: 4.3, reviews: 76, image: 'https://images.unsplash.com/photo-1557804506-669a67965ba0?auto=format&fit=crop&w=600&q=80' }
+  { id: 9, name: 'Smart Moisture pH EC Soil Meter', desc: '3-in-1 digital sensor probe for instant substrate parameters verification.', emoji: '🛠️', cat: 'Tools', price: 599, oldPrice: 890, badge: 'Limited Stock', rating: 4.3, reviews: 76, image: 'https://images.unsplash.com/photo-1557804506-669a67965ba0?auto=format&fit=crop&w=600&q=80' },
+  { id: 10, name: 'Balcony Hanging Railing Planters (Set of 3)', desc: 'Durable weather-proof plastic hangers suitable for balcony metal rails. Drain holes included.', emoji: '🪴', cat: 'Pots', price: 349, oldPrice: 499, badge: 'Best Seller', rating: 4.7, reviews: 45, image: 'https://images.unsplash.com/photo-1524492412937-b28074a5d7da?auto=format&fit=crop&w=600&q=80' },
+  { id: 11, name: 'Organic Neem Cake Fertilizer 2kg', desc: 'Rich in nitrogen and organic pest-repellent compounds. Excellent soil additive.', emoji: '🟫', cat: 'Fertilizers', price: 149, oldPrice: 199, badge: 'Organic', rating: 4.6, reviews: 52, image: 'https://images.unsplash.com/photo-1592150621744-aca64f48394a?auto=format&fit=crop&w=600&q=80' },
+  { id: 12, name: 'Automatic Balcony Drip Irrigation Kit', desc: 'Includes battery-operated timer, 10 drippers, and tubes for hassle-free watering while traveling.', emoji: '💧', cat: 'Tools', price: 899, oldPrice: 1299, badge: 'Top Brand', rating: 4.5, reviews: 29, image: 'https://images.unsplash.com/photo-1563514220-ea495c2413be?auto=format&fit=crop&w=600&q=80' },
+  { id: 13, name: 'Glow-in-the-Dark Balcony Pebble Stones', desc: 'Decorative luminescent gravel stones for pot dressing and beautiful night ambient lighting.', emoji: '✨', cat: 'Soil & Mix', price: 179, oldPrice: 249, badge: '', rating: 4.4, reviews: 33, image: 'https://images.unsplash.com/photo-1560717789-0ac7c58ac90a?auto=format&fit=crop&w=600&q=80' }
 ];
-
 
 const mockBarterListings = [
   {
@@ -71,6 +74,32 @@ const mockBarterListings = [
     contact_info: 'vikram.j@gmail.com',
     status: 'completed',
     created_at: new Date(Date.now() - 5 * 86400000).toISOString()
+  },
+  {
+    id: 'mock-b5',
+    user_id: 'mock-u5',
+    author_name: 'Chethan Gowda',
+    author_avatar: '🧑🏽',
+    author_city: 'Udupi',
+    item_offered: '10 Sprouted Organic Garlic Cloves',
+    item_wanted: 'Lemongrass slips',
+    description: 'Sourced from organic heirloom local variety. Sprouted and ready to bury in soil containers. Looking for a few slips of aromatic lemongrass.',
+    contact_info: 'chethan.g@udupigardens.net',
+    status: 'active',
+    created_at: new Date(Date.now() - 6 * 3600000).toISOString()
+  },
+  {
+    id: 'mock-b6',
+    user_id: 'mock-u6',
+    author_name: 'Deepa Swamy',
+    author_avatar: '👩🏽',
+    author_city: 'Dharwad',
+    item_offered: '15 Net Cups (2-inch)',
+    item_wanted: 'Spinach/Palak Seeds',
+    description: 'Leftover unused high-grade UV resistant net cups from my NFT build. Perfect for leafy greens. Wanting some organic Palak seeds.',
+    contact_info: 'deepa.swamy@gmail.com / 9886012345',
+    status: 'active',
+    created_at: new Date(Date.now() - 1 * 86400000).toISOString()
   }
 ];
 
@@ -384,30 +413,13 @@ const Marketplace = () => {
                   const discountPercent = Math.round(((product.oldPrice - product.price) / product.oldPrice) * 100);
                   return (
                     <div key={product.id} className="glass-card product-card-amazon" onClick={() => setSelectedProduct(product)}>
-                      <div className="product-image-box-amazon" style={{ position: 'relative', overflow: 'hidden' }}>
+                      <div className="product-image-box-amazon">
                         {product.badge && (
-                          <span className={`badge-tag ${product.badge.toLowerCase().replace(/\s+/g, '-')}`} style={{ zIndex: 2 }}>
+                          <span className={`badge-tag ${product.badge.toLowerCase().replace(/\s+/g, '-')}`}>
                             {product.badge}
                           </span>
                         )}
-                        {product.image ? (
-                          <>
-                            <img 
-                              src={product.image} 
-                              alt={product.name} 
-                              className="product-image-amazon"
-                              style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 'var(--radius-sm)' }}
-                              onError={(e) => {
-                                e.target.style.display = 'none';
-                                const fallbackEmoji = e.target.parentNode.querySelector('.product-emoji-large-fallback');
-                                if (fallbackEmoji) fallbackEmoji.style.display = 'flex';
-                              }}
-                            />
-                            <span className="product-emoji-large product-emoji-large-fallback" style={{ display: 'none' }}>{product.emoji}</span>
-                          </>
-                        ) : (
-                          <span className="product-emoji-large">{product.emoji}</span>
-                        )}
+                        <span className="product-emoji-large">{product.emoji}</span>
                       </div>
 
                       <div className="product-details-amazon">
@@ -471,24 +483,7 @@ const Marketplace = () => {
                 
                 <div className="modal-split-amazon">
                   <div className="modal-left-visual">
-                    {selectedProduct.image ? (
-                      <>
-                        <img 
-                          src={selectedProduct.image} 
-                          alt={selectedProduct.name} 
-                          className="modal-product-image"
-                          style={{ width: '100%', height: 'auto', maxHeight: '200px', objectFit: 'cover', borderRadius: 'var(--radius-md)', marginBottom: '12px' }}
-                          onError={(e) => {
-                            e.target.style.display = 'none';
-                            const emojiBox = e.target.parentNode.querySelector('.modal-emoji-box-fallback');
-                            if (emojiBox) emojiBox.style.display = 'flex';
-                          }}
-                        />
-                        <div className="modal-emoji-box modal-emoji-box-fallback" style={{ display: 'none' }}>{selectedProduct.emoji}</div>
-                      </>
-                    ) : (
-                      <div className="modal-emoji-box">{selectedProduct.emoji}</div>
-                    )}
+                    <div className="modal-emoji-box">{selectedProduct.emoji}</div>
                     <div className="badges-row">
                       <span className="badge-tag green">Secure Checkout</span>
                       <span className="badge-tag blue">Organic Choice</span>
