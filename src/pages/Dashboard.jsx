@@ -815,7 +815,19 @@ const Dashboard = () => {
             >
               <div className="plant-emoji-bg">
                 {plant.image ? (
-                  <img src={plant.image} alt={plant.name} className="plant-image" />
+                  <>
+                    <img 
+                      src={plant.image} 
+                      alt={plant.name} 
+                      className="plant-image" 
+                      onError={(e) => {
+                        e.target.style.display = 'none';
+                        const emojiSpan = e.target.parentNode.querySelector('.plant-emoji-fallback');
+                        if (emojiSpan) emojiSpan.style.display = 'inline';
+                      }}
+                    />
+                    <span className="plant-emoji plant-emoji-fallback" style={{ display: 'none' }}>{plant.emoji}</span>
+                  </>
                 ) : (
                   <span className="plant-emoji">{plant.emoji}</span>
                 )}

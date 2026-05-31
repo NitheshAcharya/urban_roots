@@ -1,8 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Menu, X, Bell, ShoppingCart, User, Sun, Moon } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useTheme } from '../context/ThemeContext';
+import { useAuth } from '../context/AuthContext';
+import { supabase } from '../utils/supabase';
 import './TopNav.css';
 
 const TopNav = () => {
@@ -11,6 +13,8 @@ const TopNav = () => {
   const location = useLocation();
   const { cartCount, setIsCartOpen } = useCart();
   const { theme, toggleTheme } = useTheme();
+  const { user, isAuthenticated } = useAuth();
+  const [notifications, setNotifications] = useState([]);
 
   const navLinks = [
     { name: 'Dashboard', path: '/' },
@@ -24,12 +28,136 @@ const TopNav = () => {
     { name: 'Nurseries', path: '/nurseries' }
   ];
 
-  const notifications = [
-    { id: 1, text: "Water your Tomato plant — Overdue!", type: "urgent", color: "red" },
-    { id: 2, text: "Fertilize Tulsi this Friday", type: "warning", color: "yellow" },
-    { id: 3, text: "Your Moringa order has been shipped", type: "success", color: "green" },
-    { id: 4, text: "Expert booking confirmed for Saturday", type: "info", color: "blue" }
+  const baseNotifications = [
+    { id: 'n-order', text: "Your Moringa order has been shipped 📦", type: "success", color: "green" },
+    { id: 'n-expert', text: "Expert booking confirmed for this Saturday 👨‍🌾", type: "info", color: "blue" }
   ];
+
+  const getPlantEmoji = (name) => {
+    const lower = name.toLowerCase();
+    if (lower.includes('lettuce')) return '🥬';
+    if (lower.includes('strawberry')) return '🍓';
+    if (lower.includes('kale')) return '🥬';
+    if (lower.includes('tomato')) return '🍅';
+    if (lower.includes('tulsi') || lower.includes('basil')) return '🌿';
+    if (lower.includes('aloe')) return '🪴';
+    if (lower.includes('mint')) return '🌿';
+    return '🌱';
+  };
+
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      try {
+        const query = isAuthenticated && user?.id
+          ? supabase.from('user_plants').select('*').eq('user_id', user.id)
+          : supabase.from('user_plants').select('*');
+
+        const { data, error } = await query;
+        if (error) throw error;
+
+        if (data && data.length > 0) {
+          const alerts = [];
+          data.forEach(p => {
+            if (!p.last_watered) return;
+            const next = new Date(p.last_watered);
+            next.setDate(next.getDate() + p.watering_frequency_days);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            next.setHours(0, 0, 0, 0);
+            
+            const diffDays = Math.ceil((next - today) / (1000 * 60 * 60 * 24));
+            const emoji = getPlantEmoji(p.plant_name);
+            if (diffDays < 0) {
+              alerts.push({
+                id: `p-${p.id}`,
+                text: `Water your ${p.plant_name} plant — Overdue! ${emoji}`,
+                type: 'urgent',
+                color: 'red'
+              });
+            } else if (diffDays === 0) {
+              alerts.push({
+                id: `p-${p.id}`,
+                text: `Water your ${p.plant_name} plant — Due today ${emoji}`,
+                type: 'warning',
+                color: 'yellow'
+              });
+            }
+          });
+
+          // Check if user has bookings as well
+          let userBookings = [];
+          try {
+            if (isAuthenticated && user?.id) {
+              const { data: bData } = await supabase
+                .from('bookings')
+                .select('*')
+                .eq('user_id', user.id)
+                .gte('date', new Date().toISOString().split('T')[0])
+                .limit(1);
+              if (bData && bData.length > 0) {
+                userBookings.push({
+                  id: `b-${bData[0].id}`,
+                  text: `Expert booking with ${bData[0].expert_name} confirmed for ${bData[0].date} 👨‍🌾`,
+                  type: 'info',
+                  color: 'blue'
+                });
+              }
+            }
+          } catch (errBooking) {
+            console.warn('Booking subquery failed, skipping booking alerts:', errBooking);
+          }
+
+          const combined = [
+            ...alerts,
+            ...userBookings,
+            ...baseNotifications.filter(b => b.id !== 'n-expert' || userBookings.length === 0)
+          ];
+
+          if (alerts.length === 0) {
+            combined.unshift({
+              id: 'p-optimal',
+              text: "All grow loops are running optimally! 🌿",
+              type: 'success',
+              color: 'green'
+            });
+          }
+
+          setNotifications(combined);
+        } else {
+          // Fallback to static mock alerts
+          setNotifications([
+            { id: 1, text: "Water your Tomato plant — Overdue! 🍅", type: "urgent", color: "red" },
+            { id: 2, text: "Fertilize Tulsi this Friday 🌿", type: "warning", color: "yellow" },
+            ...baseNotifications
+          ]);
+        }
+      } catch (err) {
+        console.warn('Failed to load navigation alerts:', err);
+        setNotifications([
+          { id: 1, text: "Water your Tomato plant — Overdue! 🍅", type: "urgent", color: "red" },
+          { id: 2, text: "Fertilize Tulsi this Friday 🌿", type: "warning", color: "yellow" },
+          ...baseNotifications
+        ]);
+      }
+    };
+
+    fetchNotifications();
+    
+    // Subscribe to changes in user_plants to update notifications dynamically
+    let subscription;
+    if (isAuthenticated && user?.id) {
+      subscription = supabase
+        .channel('public:user_plants')
+        .on('postgres_changes', { event: '*', filter: `user_id=eq.${user.id}`, schema: 'public', table: 'user_plants' }, () => {
+          fetchNotifications();
+        })
+        .subscribe();
+    }
+    
+    return () => {
+      if (subscription) supabase.removeChannel(subscription);
+    };
+  }, [user, isAuthenticated]);
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -84,7 +212,11 @@ const TopNav = () => {
             <div className="notification-wrapper">
               <button className="action-btn bell-btn" onClick={toggleNotifications}>
                 <Bell size={20} color="var(--color-text-primary)" />
-                <span className="badge bell-badge">{notifications.length}</span>
+                {notifications.filter(n => n.type === 'urgent' || n.type === 'warning').length > 0 && (
+                  <span className="badge bell-badge">
+                    {notifications.filter(n => n.type === 'urgent' || n.type === 'warning').length}
+                  </span>
+                )}
               </button>
 
               {isNotificationsOpen && (

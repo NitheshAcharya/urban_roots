@@ -48,6 +48,89 @@ const MOCK_RECIPES = [
   },
 ];
 
+function generateDynamicMocks(ingredients, harvestQty, count) {
+  const mainIng = ingredients[0] || 'Garden Herb';
+  const secondIng = ingredients[1] || (ingredients[0] ? 'Garnish' : 'Vegetables');
+
+  const mockRecipesList = [
+    {
+      name: `Karnataka Style ${mainIng} & ${secondIng} Chutney`,
+      description: `A traditional, tangy and spicy chutney from Karnataka featuring freshly harvested ${mainIng} and ${secondIng}, perfect with idli, dosa, or hot rice.`,
+      difficulty: 'Easy',
+      ingredients: [
+        `${harvestQty} fresh ${mainIng}`,
+        ingredients[1] ? `A handful of fresh ${secondIng}` : '2-3 sprigs of Curry leaves',
+        '1 tbsp Cooking Oil',
+        '1 tsp Mustard seeds',
+        '1 tsp Urad dal',
+        '2-3 Dry red chilies',
+        'A small piece of Tamarind',
+        'Salt to taste'
+      ],
+      instructions: [
+        `Wash the fresh ${mainIng} ${ingredients[1] ? `and ${secondIng}` : ''} thoroughly.`,
+        'Heat oil in a pan, add urad dal, mustard seeds, and dry red chilies. Sauté until the dal turns golden brown.',
+        `Add the fresh ${mainIng} and sauté for 2-3 minutes until wilted.`,
+        'Let the mixture cool down completely.',
+        'Grind the sautéed ingredients with tamarind and salt into a smooth paste, adding a little water if needed.',
+        'Serve fresh with hot rice or dose!'
+      ],
+      prepTime: '12 mins',
+      servings: 3
+    },
+    {
+      name: `Spicy ${mainIng} & ${secondIng} Garden Stir-Fry`,
+      description: `A quick, healthy stir-fry highlighting the fresh crunch of ${mainIng} complemented by the aroma of ${secondIng}.`,
+      difficulty: 'Easy',
+      ingredients: [
+        `2 cups of chopped ${mainIng}`,
+        ingredients[1] ? `1/2 cup of ${secondIng}` : 'A handful of fresh herbs',
+        '1 tbsp Cooking oil',
+        '2 cloves Garlic, minced',
+        '1 green chili, slit',
+        '1/2 tsp Turmeric powder',
+        '1/2 tsp Mustard seeds',
+        'Salt & black pepper to taste'
+      ],
+      instructions: [
+        `Thoroughly rinse the fresh ${mainIng} and ${secondIng} under running water.`,
+        'Heat cooking oil in a pan or wok over medium heat. Crackle the mustard seeds.',
+        'Add minced garlic and green chili. Sauté for 30 seconds until fragrant.',
+        `Toss in the chopped ${mainIng} and sauté for 3-4 minutes.`,
+        `Add the ${secondIng}, turmeric, salt, and pepper. Stir fry on high heat for another 2 minutes.`,
+        'Serve hot as a healthy side dish.'
+      ],
+      prepTime: '15 mins',
+      servings: 2
+    },
+    {
+      name: `Aromatic ${mainIng} & ${secondIng} Wellness Brew`,
+      description: `An immune-boosting herbal infusion utilizing fresh ${secondIng} and ${mainIng} straight from your home garden.`,
+      difficulty: 'Easy',
+      ingredients: [
+        ingredients[1] ? `A small handful of fresh ${secondIng}` : `A few sprigs of ${mainIng}`,
+        ingredients[0] && ingredients[1] ? `2-3 leaves of ${mainIng}` : '1 Lemon, sliced',
+        '3 cups Water',
+        '1 inch Ginger, crushed',
+        '2-3 Black peppercorns, crushed',
+        '1 tsp Honey or Jaggery (optional)'
+      ],
+      instructions: [
+        `Gently crush the washed ${mainIng} and ${secondIng} leaves to release their essential oils.`,
+        'Bring 3 cups of water to a boil in a saucepan.',
+        `Add the crushed ingredients, ginger, and black peppercorns to the boiling water.`,
+        'Reduce the heat and let it simmer for 5-7 minutes until the water reduces slightly.',
+        'Strain the herbal brew into cups.',
+        'Stir in honey or jaggery if desired, and sip warm.'
+      ],
+      prepTime: '10 mins',
+      servings: 2
+    }
+  ];
+
+  return mockRecipesList.slice(0, count);
+}
+
 export default async function handler(req, res) {
   if (cors(req, res)) return;
 
@@ -65,16 +148,17 @@ export default async function handler(req, res) {
     // Parse recipeCount to ensure it is a valid integer
     const count = parseInt(recipeCount, 10) || 3;
 
-    // Fallback to mock recipes if no API key
+    // Fallback to dynamic mock recipes if no API key
     if (!GEMINI_API_KEY) {
-      return res.status(200).json({ recipes: MOCK_RECIPES.slice(0, count) });
+      return res.status(200).json({ recipes: generateDynamicMocks(ingredients, harvestQty, count) });
     }
 
-    const prompt = `Generate ${count} culinary recipes using these home-grown ingredients: ${ingredients.join(', ')} (approximate harvest quantity: ${harvestQty}).
+    const prompt = `Generate ${count} completely unique and different culinary recipes based SPECIFICALLY on this combination of home-grown ingredients: ${ingredients.join(', ')} (approximate harvest quantity: ${harvestQty}).
+Each recipe MUST feature these ingredients: ${ingredients.join(', ')} prominently. The recipes must be distinctly different from one another in terms of style (e.g. one salad/stir-fry, one main dish/curry, one soup/beverage), flavor profile, and cooking technique. Do NOT return similar or repetitive recipes.
+Prefer authentic Indian (especially South Indian/Karnataka-style like Chutney, Gojju, Saaru, or Pulao) when possible.
 For each recipe, include the name, a short description, difficulty (Easy/Medium/Hard), full ingredient list with quantities, step-by-step instructions (as a JSON array of strings), prep time, and servings.
-Prefer Indian/Karnataka-style recipes when possible.
 Return ONLY a valid JSON array of objects with the exact keys: name, description, difficulty, ingredients (array of strings), instructions (array of strings), prepTime, servings.
-Do not include any extra text outside the JSON array.`;
+Do not include any extra text outside the JSON array. [Random Seed: ${Math.random()}]`;
 
     const geminiResponse = await fetch(GEMINI_URL, {
       method: 'POST',
@@ -82,7 +166,7 @@ Do not include any extra text outside the JSON array.`;
       body: JSON.stringify({
         contents: [{ role: 'user', parts: [{ text: prompt }] }],
         generationConfig: {
-          temperature: 0.8,
+          temperature: 0.85,
           maxOutputTokens: 4096,
           responseMimeType: 'application/json',
         },
@@ -92,7 +176,7 @@ Do not include any extra text outside the JSON array.`;
     if (!geminiResponse.ok) {
       const errBody = await geminiResponse.text();
       console.error('Gemini recipe API error:', errBody);
-      return res.status(200).json({ recipes: MOCK_RECIPES.slice(0, count) });
+      return res.status(200).json({ recipes: generateDynamicMocks(ingredients, harvestQty, count) });
     }
 
     const data = await geminiResponse.json();
@@ -109,7 +193,7 @@ Do not include any extra text outside the JSON array.`;
       }
     } catch (parseErr) {
       console.error('Failed to parse Gemini recipes response:', parseErr, textResponse);
-      recipes = MOCK_RECIPES.slice(0, count);
+      recipes = generateDynamicMocks(ingredients, harvestQty, count);
     }
 
     return res.status(200).json({ recipes });
@@ -118,3 +202,4 @@ Do not include any extra text outside the JSON array.`;
     return res.status(500).json({ error: 'Internal server error' });
   }
 }
+

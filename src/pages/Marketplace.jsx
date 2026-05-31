@@ -7,16 +7,17 @@ import { awardXP, unlockBadge } from '../utils/gamification';
 import './Marketplace.css';
 
 const productsData = [
-  { id: 1, name: 'Premium Butterhead Lettuce Seeds', desc: 'Non-GMO seeds, high germination rate (95%+), ideal for vertical NFT towers.', emoji: '🥬', cat: 'Seeds', price: 69, oldPrice: 99, badge: 'Best Seller', rating: 4.8, reviews: 142 },
-  { id: 2, name: 'Hydroponic Strawberry Runners', desc: 'Pre-rooted Albion strawberry crowns, ready to insert into vertical pockets.', emoji: '🍓', cat: 'Seeds', price: 189, oldPrice: 249, badge: 'Deal of the Day', rating: 4.6, reviews: 88 },
-  { id: 3, name: 'Active Grow Hydroponic Nutrients 1L', desc: 'Specialized liquid mineral fertilizer (A+B) for vegetative and fruiting loops.', emoji: '🧪', cat: 'Fertilizers', price: 349, oldPrice: 499, badge: 'Best Seller', rating: 4.9, reviews: 215 },
-  { id: 4, name: 'Expanded Clay Pebbles 10L', desc: 'Porous clay balls providing optimal root aeration for DWC and flood tables.', emoji: '🪨', cat: 'Soil & Mix', price: 299, oldPrice: 399, badge: '', rating: 4.7, reviews: 67 },
-  { id: 5, name: 'Coco Coir Grow Block 5kg', desc: 'Low EC coconut husk fibers, expands up to 75L. Great water retention.', emoji: '🥥', cat: 'Soil & Mix', price: 219, oldPrice: 279, badge: 'Organic', rating: 4.5, reviews: 120 },
-  { id: 6, name: 'Self-Watering Balcony Planter', desc: 'Equipped with wicking indicator ropes and subsurface water level gauges.', emoji: '🪴', cat: 'Pots', price: 449, oldPrice: 599, badge: '', rating: 4.4, reviews: 54 },
-  { id: 7, name: 'Vertical Grow Tower (30 Pockets)', desc: 'Modular aeroponic stackable column tower with wicking reservoir pump.', emoji: '🗼', cat: 'Pots', price: 3499, oldPrice: 4999, badge: 'Top Brand', rating: 4.8, reviews: 31 },
-  { id: 8, name: 'Neem Oil Pest Control Spray 500ml', desc: 'Cold-pressed natural insect repellent. Non-toxic for home organic plants.', emoji: '🌿', cat: 'Fertilizers', price: 129, oldPrice: 179, badge: 'Organic', rating: 4.6, reviews: 93 },
-  { id: 9, name: 'Smart Moisture pH EC Soil Meter', desc: '3-in-1 digital sensor probe for instant substrate parameters verification.', emoji: '🛠️', cat: 'Tools', price: 599, oldPrice: 890, badge: 'Limited Stock', rating: 4.3, reviews: 76 }
+  { id: 1, name: 'Premium Butterhead Lettuce Seeds', desc: 'Non-GMO seeds, high germination rate (95%+), ideal for vertical NFT towers.', emoji: '🥬', cat: 'Seeds', price: 69, oldPrice: 99, badge: 'Best Seller', rating: 4.8, reviews: 142, image: 'https://images.unsplash.com/photo-1550147760-44c9966d6bc7?auto=format&fit=crop&w=600&q=80' },
+  { id: 2, name: 'Hydroponic Strawberry Runners', desc: 'Pre-rooted Albion strawberry crowns, ready to insert into vertical pockets.', emoji: '🍓', cat: 'Seeds', price: 189, oldPrice: 249, badge: 'Deal of the Day', rating: 4.6, reviews: 88, image: 'https://images.unsplash.com/photo-1601004890684-d8cbf643f5f2?auto=format&fit=crop&w=600&q=80' },
+  { id: 3, name: 'Active Grow Hydroponic Nutrients 1L', desc: 'Specialized liquid mineral fertilizer (A+B) for vegetative and fruiting loops.', emoji: '🧪', cat: 'Fertilizers', price: 349, oldPrice: 499, badge: 'Best Seller', rating: 4.9, reviews: 215, image: 'https://images.unsplash.com/photo-1628352081506-83c43123ed6d?auto=format&fit=crop&w=600&q=80' },
+  { id: 4, name: 'Expanded Clay Pebbles 10L', desc: 'Porous clay balls providing optimal root aeration for DWC and flood tables.', emoji: '🪨', cat: 'Soil & Mix', price: 299, oldPrice: 399, badge: '', rating: 4.7, reviews: 67, image: 'https://images.unsplash.com/photo-1618220179428-22790b461013?auto=format&fit=crop&w=600&q=80' },
+  { id: 5, name: 'Coco Coir Grow Block 5kg', desc: 'Low EC coconut husk fibers, expands up to 75L. Great water retention.', emoji: '🥥', cat: 'Soil & Mix', price: 219, oldPrice: 279, badge: 'Organic', rating: 4.5, reviews: 120, image: 'https://images.unsplash.com/photo-1599599810769-bcde5a160d32?auto=format&fit=crop&w=600&q=80' },
+  { id: 6, name: 'Self-Watering Balcony Planter', desc: 'Equipped with wicking indicator ropes and subsurface water level gauges.', emoji: '🪴', cat: 'Pots', price: 449, oldPrice: 599, badge: '', rating: 4.4, reviews: 54, image: 'https://images.unsplash.com/photo-1485955900006-10f4d324d411?auto=format&fit=crop&w=600&q=80' },
+  { id: 7, name: 'Vertical Grow Tower (30 Pockets)', desc: 'Modular aeroponic stackable column tower with wicking reservoir pump.', emoji: '🗼', cat: 'Pots', price: 3499, oldPrice: 4999, badge: 'Top Brand', rating: 4.8, reviews: 31, image: 'https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?auto=format&fit=crop&w=600&q=80' },
+  { id: 8, name: 'Neem Oil Pest Control Spray 500ml', desc: 'Cold-pressed natural insect repellent. Non-toxic for home organic plants.', emoji: '🌿', cat: 'Fertilizers', price: 129, oldPrice: 179, badge: 'Organic', rating: 4.6, reviews: 93, image: 'https://images.unsplash.com/photo-1581578731548-c64695cc6952?auto=format&fit=crop&w=600&q=80' },
+  { id: 9, name: 'Smart Moisture pH EC Soil Meter', desc: '3-in-1 digital sensor probe for instant substrate parameters verification.', emoji: '🛠️', cat: 'Tools', price: 599, oldPrice: 890, badge: 'Limited Stock', rating: 4.3, reviews: 76, image: 'https://images.unsplash.com/photo-1557804506-669a67965ba0?auto=format&fit=crop&w=600&q=80' }
 ];
+
 
 const mockBarterListings = [
   {
@@ -383,13 +384,30 @@ const Marketplace = () => {
                   const discountPercent = Math.round(((product.oldPrice - product.price) / product.oldPrice) * 100);
                   return (
                     <div key={product.id} className="glass-card product-card-amazon" onClick={() => setSelectedProduct(product)}>
-                      <div className="product-image-box-amazon">
+                      <div className="product-image-box-amazon" style={{ position: 'relative', overflow: 'hidden' }}>
                         {product.badge && (
-                          <span className={`badge-tag ${product.badge.toLowerCase().replace(/\s+/g, '-')}`}>
+                          <span className={`badge-tag ${product.badge.toLowerCase().replace(/\s+/g, '-')}`} style={{ zIndex: 2 }}>
                             {product.badge}
                           </span>
                         )}
-                        <span className="product-emoji-large">{product.emoji}</span>
+                        {product.image ? (
+                          <>
+                            <img 
+                              src={product.image} 
+                              alt={product.name} 
+                              className="product-image-amazon"
+                              style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 'var(--radius-sm)' }}
+                              onError={(e) => {
+                                e.target.style.display = 'none';
+                                const fallbackEmoji = e.target.parentNode.querySelector('.product-emoji-large-fallback');
+                                if (fallbackEmoji) fallbackEmoji.style.display = 'flex';
+                              }}
+                            />
+                            <span className="product-emoji-large product-emoji-large-fallback" style={{ display: 'none' }}>{product.emoji}</span>
+                          </>
+                        ) : (
+                          <span className="product-emoji-large">{product.emoji}</span>
+                        )}
                       </div>
 
                       <div className="product-details-amazon">
@@ -453,7 +471,24 @@ const Marketplace = () => {
                 
                 <div className="modal-split-amazon">
                   <div className="modal-left-visual">
-                    <div className="modal-emoji-box">{selectedProduct.emoji}</div>
+                    {selectedProduct.image ? (
+                      <>
+                        <img 
+                          src={selectedProduct.image} 
+                          alt={selectedProduct.name} 
+                          className="modal-product-image"
+                          style={{ width: '100%', height: 'auto', maxHeight: '200px', objectFit: 'cover', borderRadius: 'var(--radius-md)', marginBottom: '12px' }}
+                          onError={(e) => {
+                            e.target.style.display = 'none';
+                            const emojiBox = e.target.parentNode.querySelector('.modal-emoji-box-fallback');
+                            if (emojiBox) emojiBox.style.display = 'flex';
+                          }}
+                        />
+                        <div className="modal-emoji-box modal-emoji-box-fallback" style={{ display: 'none' }}>{selectedProduct.emoji}</div>
+                      </>
+                    ) : (
+                      <div className="modal-emoji-box">{selectedProduct.emoji}</div>
+                    )}
                     <div className="badges-row">
                       <span className="badge-tag green">Secure Checkout</span>
                       <span className="badge-tag blue">Organic Choice</span>

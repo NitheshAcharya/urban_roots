@@ -209,7 +209,21 @@ const Encyclopedia = () => {
             <div key={plant.id} className="glass-card plant-grid-card-v2" onClick={() => handleCardClick(plant)}>
               <div className="card-image-wrapper">
                 {plant.image ? (
-                  <img src={plant.image} alt={plant.name} className="card-image" />
+                  <>
+                    <img 
+                      src={plant.image} 
+                      alt={plant.name} 
+                      className="card-image" 
+                      onError={(e) => {
+                        e.target.style.display = 'none';
+                        const emojiDiv = e.target.parentNode.querySelector('.card-emoji-placeholder-fallback');
+                        if (emojiDiv) emojiDiv.style.display = 'flex';
+                      }}
+                    />
+                    <div className="card-emoji-placeholder card-emoji-placeholder-fallback" style={{ display: 'none' }}>
+                      {plant.emoji}
+                    </div>
+                  </>
                 ) : (
                   <div className="card-emoji-placeholder">{plant.emoji}</div>
                 )}

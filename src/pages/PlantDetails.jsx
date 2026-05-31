@@ -605,7 +605,19 @@ const PlantDetails = () => {
         {/* Hero visual banner with overlay */}
         <div className="pd-hero-v2" style={{ position: 'relative' }}>
           {plant.image ? (
-            <img src={plant.image} alt={plant.name} className="pd-hero-image" />
+            <>
+              <img 
+                src={plant.image} 
+                alt={plant.name} 
+                className="pd-hero-image" 
+                onError={(e) => {
+                  e.target.style.display = 'none';
+                  const emojiDiv = e.target.parentNode.querySelector('.pd-emoji-placeholder-fallback');
+                  if (emojiDiv) emojiDiv.style.display = 'flex';
+                }}
+              />
+              <div className="pd-emoji-placeholder pd-emoji-placeholder-fallback" style={{ display: 'none' }}>{plant.emoji}</div>
+            </>
           ) : (
             <div className="pd-emoji-placeholder">{plant.emoji}</div>
           )}
@@ -903,7 +915,18 @@ const PlantDetails = () => {
                 {growthPhases.map((phase, i) => (
                   <div key={i} className="glass-card pd-phase-card-v2">
                     <div className="phase-img-box">
-                      <img src={phase.image} alt={`Week ${phase.week}`} />
+                      <img 
+                        src={phase.image} 
+                        alt={`Week ${phase.week}`} 
+                        onError={(e) => {
+                          e.target.style.display = 'none';
+                          const emojiDiv = e.target.parentNode.querySelector('.phase-emoji-fallback');
+                          if (emojiDiv) emojiDiv.style.display = 'flex';
+                        }}
+                      />
+                      <div className="phase-emoji-fallback" style={{ display: 'none', justifyContent: 'center', alignItems: 'center', width: '100%', height: '100%', fontSize: '2rem' }}>
+                        {phase.week <= 2 ? '🌱' : phase.week <= 5 ? '🌿' : phase.week <= 8 ? '🪴' : plant.emoji || '🥗'}
+                      </div>
                     </div>
                     <div className="pd-phase-info-v2">
                       <span className="pd-phase-week-v2">Week {phase.week}</span>
@@ -919,7 +942,18 @@ const PlantDetails = () => {
                 {varieties.map((variety, i) => (
                   <div key={i} className="glass-card pd-variety-card-v2">
                     <div className="variety-img-box">
-                      <img src={variety.image} alt={variety.name} />
+                      <img 
+                        src={variety.image} 
+                        alt={variety.name} 
+                        onError={(e) => {
+                          e.target.style.display = 'none';
+                          const emojiDiv = e.target.parentNode.querySelector('.variety-emoji-fallback');
+                          if (emojiDiv) emojiDiv.style.display = 'flex';
+                        }}
+                      />
+                      <div className="variety-emoji-fallback" style={{ display: 'none', justifyContent: 'center', alignItems: 'center', width: '100%', height: '100%', fontSize: '2rem' }}>
+                        {plant.emoji || '🌱'}
+                      </div>
                     </div>
                     <div className="pd-variety-info-v2">
                       <h4>{variety.name}</h4>

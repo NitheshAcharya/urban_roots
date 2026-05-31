@@ -169,8 +169,19 @@
   transition: transform 0.3s ease;
 }
 
+.product-image-amazon {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
 .product-card-amazon:hover .product-emoji-large {
   transform: scale(1.08);
+}
+
+.product-card-amazon:hover .product-image-amazon {
+  transform: scale(1.04);
 }
 
 .badge-tag {

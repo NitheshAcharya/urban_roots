@@ -225,7 +225,23 @@ const Nurseries = () => {
                 </button>
                 
                 <div className="overlay-detail-header">
-                  <img src={selectedNursery.img} alt={selectedNursery.name} className="overlay-detail-img" />
+                  {selectedNursery.img ? (
+                    <>
+                      <img 
+                        src={selectedNursery.img} 
+                        alt={selectedNursery.name} 
+                        className="overlay-detail-img" 
+                        onError={(e) => {
+                          e.target.style.display = 'none';
+                          const fallbackEmoji = e.target.parentNode.querySelector('.nursery-img-fallback');
+                          if (fallbackEmoji) fallbackEmoji.style.display = 'flex';
+                        }}
+                      />
+                      <div className="overlay-detail-img nursery-img-fallback" style={{ display: 'none', justifyContent: 'center', alignItems: 'center', backgroundColor: 'var(--color-border)', fontSize: '2rem' }}>🏪</div>
+                    </>
+                  ) : (
+                    <div className="overlay-detail-img nursery-img-fallback" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', backgroundColor: 'var(--color-border)', fontSize: '2rem' }}>🏪</div>
+                  )}
                   <div className="overlay-header-info">
                     <h4>{selectedNursery.name}</h4>
                     <span className="overlay-type">{selectedNursery.type}</span>
@@ -244,7 +260,19 @@ const Nurseries = () => {
 
                   <div className="overlay-gallery-row">
                     {selectedNursery.gallery.map((imgUrl, i) => (
-                      <img key={i} src={imgUrl} alt="gallery thumbnail" />
+                      <div key={i} className="gallery-thumbnail-box" style={{ width: 'calc(33.33% - 4px)', height: '50px', borderRadius: '4px', overflow: 'hidden', display: 'inline-block', position: 'relative', backgroundColor: 'var(--color-border)' }}>
+                        <img 
+                          src={imgUrl} 
+                          alt="gallery thumbnail" 
+                          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                          onError={(e) => {
+                            e.target.style.display = 'none';
+                            const fallbackEmoji = e.target.parentNode.querySelector('.gallery-emoji-fallback');
+                            if (fallbackEmoji) fallbackEmoji.style.display = 'flex';
+                          }}
+                        />
+                        <div className="gallery-emoji-fallback" style={{ display: 'none', width: '100%', height: '100%', justifyContent: 'center', alignItems: 'center', fontSize: '1.2rem' }}>🌱</div>
+                      </div>
                     ))}
                   </div>
 
