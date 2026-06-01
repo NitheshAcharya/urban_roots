@@ -92,6 +92,41 @@ const mockPosts = [
     isLiked: false,
     isDisliked: false,
     tags: ['CorianderHydro', 'SummerGardening', 'RootZoneTemp']
+  },
+  {
+    id: 6,
+    author: 'Rohan Mehta',
+    avatar: '🧑🏽',
+    city: 'Bengaluru',
+    time: '4 days ago',
+    type: 'showcase',
+    content: 'Just set up my new vertical NFT (Nutrient Film Technique) system on the balcony. Growing butterhead lettuce, kale, and cherry tomatoes. Everything is powered by a small 15W pump on a timer (15m on, 45m off). The growth rate in just 10 days is insane! 🥬📈',
+    likes: 84,
+    dislikes: 1,
+    comments: [
+      { id: 1, author: 'Priya Sharma', avatar: '👩🏽‍🌾', text: 'Stunning setup! What EC level are you running for leafy greens?', time: '3d ago', likes: 4 },
+      { id: 2, author: 'Rohan Mehta', avatar: '🧑🏽', text: 'Running EC at 1.4 right now. Keep it slightly lower for summer lettuce to avoid tip burn.', time: '3d ago', likes: 2 }
+    ],
+    isLiked: false,
+    isDisliked: false,
+    tags: ['NFTSystem', 'BalconyGardening', 'Hydroponics']
+  },
+  {
+    id: 7,
+    author: 'Dr. Ananya',
+    avatar: '👩🏽‍🔬',
+    city: 'Bengaluru',
+    time: '5 days ago',
+    type: 'tip',
+    content: 'Understanding pH Drift: In small hydroponic reservoirs (less than 50 liters), pH tends to rise daily as plants absorb nitrogen. Do not panic and dump pH-down every few hours! A slight drift between 5.5 and 6.5 is perfectly normal and actually helps plants absorb different microelements. Only adjust when it exits this range. 🧪📊',
+    likes: 110,
+    dislikes: 0,
+    comments: [
+      { id: 1, author: 'Karthik Reddy', avatar: '👨🏽‍🔬', text: 'This explains so much. I was adjusting daily and got nutrient lockouts!', time: '4d ago', likes: 7 }
+    ],
+    isLiked: false,
+    isDisliked: false,
+    tags: ['pHDrift', 'NutrientScience', 'Hydroponics101']
   }
 ];
 
@@ -121,49 +156,108 @@ const Community = () => {
   };
 
   const fetchPosts = async () => {
+    let dbPosts = [];
     try {
       const { data, error } = await supabase
         .from('community_posts')
         .select('*, community_comments(*)')
         .order('created_at', { ascending: false });
-      if (error) throw error;
       
-      const formatted = (data || []).map(p => {
-        const postComments = (p.community_comments || []).map(c => ({
-          id: c.id,
-          author: c.author_name,
-          avatar: c.author_avatar || '🌱',
-          text: c.content,
-          time: formatTimeAgo(c.created_at),
-          likes: 0
-        })).sort((a, b) => new Date(a.time) - new Date(b.time));
+      if (!error && data) {
+        dbPosts = data.map(p => {
+          const postComments = (p.community_comments || []).map(c => ({
+            id: c.id,
+            author: c.author_name,
+            avatar: c.author_avatar || '🌱',
+            text: c.content,
+            time: formatTimeAgo(c.created_at),
+            likes: 0,
+            created_at: c.created_at
+          })).sort((a, b) => new Date(a.time) - new Date(b.time));
 
-        return {
-          id: p.id,
-          author: p.author_name,
-          avatar: p.author_avatar || '🌱',
-          city: p.author_city || 'Bengaluru',
-          time: formatTimeAgo(p.created_at),
-          type: p.post_type,
-          content: p.content,
-          likes: p.likes || 0,
-          dislikes: p.dislikes || 0,
-          comments: postComments,
-          tags: p.tags || [],
-          userId: p.user_id,
-          isLiked: userLikesMap[p.id] === 'like',
-          isDisliked: userLikesMap[p.id] === 'dislike'
-        };
-      });
-      
-      setPosts(formatted);
+          return {
+            id: p.id,
+            author: p.author_name,
+            avatar: p.author_avatar || '🌱',
+            city: p.author_city || 'Bengaluru',
+            time: formatTimeAgo(p.created_at),
+            type: p.post_type,
+            content: p.content,
+            likes: p.likes || 0,
+            dislikes: p.dislikes || 0,
+            comments: postComments,
+            tags: p.tags || [],
+            userId: p.user_id,
+            isLiked: userLikesMap[p.id] === 'like',
+            isDisliked: userLikesMap[p.id] === 'dislike',
+            created_at: p.created_at
+          };
+        });
+      }
     } catch (err) {
       console.error('Error fetching posts:', err.message);
     }
+
+    // Load local storage posts
+    let localPosts = [];
+    try {
+      const stored = localStorage.getItem('community_posts_local');
+      if (stored) {
+        localPosts = JSON.parse(stored).map(p => ({
+          ...p,
+          time: formatTimeAgo(p.created_at),
+          isLiked: userLikesMap[p.id] === 'like',
+          isDisliked: userLikesMap[p.id] === 'dislike'
+        }));
+      }
+    } catch (err) {
+      console.error('Error reading local community posts:', err);
+    }
+
+    // Load local comments
+    let localCommentsMap = {};
+    try {
+      const storedComments = localStorage.getItem('community_comments_local');
+      if (storedComments) {
+        localCommentsMap = JSON.parse(storedComments);
+      }
+    } catch (err) {
+      console.error('Error reading local comments:', err);
+    }
+
+    // Combine posts
+    const dbAndLocalIds = new Set([...dbPosts.map(p => p.id), ...localPosts.map(p => p.id)]);
+    const filteredMocks = mockPosts.filter(m => !dbAndLocalIds.has(m.id));
+
+    // Map combined posts and merge local comments
+    const combined = [...dbPosts, ...localPosts, ...filteredMocks].map(p => {
+      const extraComments = localCommentsMap[p.id] || [];
+      const updatedComments = [...(p.comments || []), ...extraComments.map(c => ({
+        ...c,
+        time: c.created_at ? formatTimeAgo(c.created_at) : c.time
+      }))];
+      
+      return {
+        ...p,
+        comments: updatedComments,
+        isLiked: userLikesMap[p.id] === 'like',
+        isDisliked: userLikesMap[p.id] === 'dislike'
+      };
+    });
+
+    setPosts(combined);
   };
 
   const fetchUserLikes = async () => {
-    if (!user) return;
+    if (!user) {
+      const localLikes = localStorage.getItem('user_likes_local');
+      if (localLikes) {
+        setUserLikesMap(JSON.parse(localLikes));
+      } else {
+        setUserLikesMap({});
+      }
+      return;
+    }
     try {
       const { data, error } = await supabase
         .from('post_likes')
@@ -187,11 +281,7 @@ const Community = () => {
   }, [userLikesMap]);
 
   useEffect(() => {
-    if (user) {
-      fetchUserLikes();
-    } else {
-      setUserLikesMap({});
-    }
+    fetchUserLikes();
   }, [user]);
 
   useEffect(() => {
@@ -223,8 +313,31 @@ const Community = () => {
   });
 
   const handleLike = async (postId) => {
-    if (!isAuthenticated) return;
     const currentStatus = userLikesMap[postId];
+    const nextStatus = currentStatus === 'like' ? null : 'like';
+
+    if (!isAuthenticated || !user) {
+      const newLikesMap = { ...userLikesMap, [postId]: nextStatus };
+      setUserLikesMap(newLikesMap);
+      localStorage.setItem('user_likes_local', JSON.stringify(newLikesMap));
+      
+      setPosts(prev => prev.map(p => {
+        if (p.id === postId) {
+          let diff = nextStatus === 'like' ? 1 : -1;
+          let dislikeDiff = currentStatus === 'dislike' ? -1 : 0;
+          return {
+            ...p,
+            likes: Math.max(0, p.likes + diff),
+            dislikes: Math.max(0, p.dislikes + dislikeDiff),
+            isLiked: nextStatus === 'like',
+            isDisliked: false
+          };
+        }
+        return p;
+      }));
+      return;
+    }
+
     try {
       if (currentStatus === 'like') {
         await supabase.from('post_likes').delete().eq('user_id', user.id).eq('post_id', postId);
@@ -257,8 +370,31 @@ const Community = () => {
   };
 
   const handleDislike = async (postId) => {
-    if (!isAuthenticated) return;
     const currentStatus = userLikesMap[postId];
+    const nextStatus = currentStatus === 'dislike' ? null : 'dislike';
+
+    if (!isAuthenticated || !user) {
+      const newLikesMap = { ...userLikesMap, [postId]: nextStatus };
+      setUserLikesMap(newLikesMap);
+      localStorage.setItem('user_likes_local', JSON.stringify(newLikesMap));
+      
+      setPosts(prev => prev.map(p => {
+        if (p.id === postId) {
+          let diff = nextStatus === 'dislike' ? 1 : -1;
+          let likeDiff = currentStatus === 'like' ? -1 : 0;
+          return {
+            ...p,
+            dislikes: Math.max(0, p.dislikes + diff),
+            likes: Math.max(0, p.likes + likeDiff),
+            isDisliked: nextStatus === 'dislike',
+            isLiked: false
+          };
+        }
+        return p;
+      }));
+      return;
+    }
+
     try {
       if (currentStatus === 'dislike') {
         await supabase.from('post_likes').delete().eq('user_id', user.id).eq('post_id', postId);
@@ -292,27 +428,57 @@ const Community = () => {
 
   const handleNewPost = async (e) => {
     e.preventDefault();
-    if (!newPostContent.trim() || !user) return;
+    if (!newPostContent.trim()) return;
+
+    const postObject = {
+      id: `local-p-${Date.now()}`,
+      author: profile?.full_name || 'Guest Gardener',
+      avatar: profile?.avatar_url || '🌱',
+      city: profile?.city || 'Bengaluru',
+      time: 'Just now',
+      type: newPostType,
+      content: newPostContent,
+      likes: 0,
+      dislikes: 0,
+      comments: [],
+      tags: [newPostType === 'question' ? 'Question' : newPostType === 'showcase' ? 'Showcase' : 'Tip', 'UrbanGrow'],
+      userId: user?.id || 'guest',
+      isLiked: false,
+      isDisliked: false,
+      created_at: new Date().toISOString()
+    };
 
     try {
-      const { error } = await supabase
-        .from('community_posts')
-        .insert([{
-          user_id: user.id,
-          author_name: profile?.full_name || 'Anonymous Gardener',
-          author_city: profile?.city || 'Bengaluru',
-          author_avatar: profile?.avatar_url || '🌱',
-          post_type: newPostType,
-          content: newPostContent,
-          tags: [newPostType === 'question' ? 'Question' : newPostType === 'showcase' ? 'Showcase' : 'Tip', 'UrbanGrow']
-        }]);
+      if (isAuthenticated && user) {
+        const { error } = await supabase
+          .from('community_posts')
+          .insert([{
+            user_id: user.id,
+            author_name: profile?.full_name || 'Anonymous Gardener',
+            author_city: profile?.city || 'Bengaluru',
+            author_avatar: profile?.avatar_url || '🌱',
+            post_type: newPostType,
+            content: newPostContent,
+            tags: [newPostType === 'question' ? 'Question' : newPostType === 'showcase' ? 'Showcase' : 'Tip', 'UrbanGrow']
+          }]);
 
-      if (error) throw error;
+        if (error) throw error;
+      } else {
+        const localPosts = localStorage.getItem('community_posts_local');
+        const parsed = localPosts ? JSON.parse(localPosts) : [];
+        localStorage.setItem('community_posts_local', JSON.stringify([postObject, ...parsed]));
+      }
       setNewPostContent('');
       setIsComposerOpen(false);
       fetchPosts();
     } catch (err) {
-      console.error('Error creating post:', err.message);
+      console.error('Error creating post, falling back to local storage:', err.message);
+      const localPosts = localStorage.getItem('community_posts_local');
+      const parsed = localPosts ? JSON.parse(localPosts) : [];
+      localStorage.setItem('community_posts_local', JSON.stringify([postObject, ...parsed]));
+      setNewPostContent('');
+      setIsComposerOpen(false);
+      fetchPosts();
     }
   };
 
@@ -322,24 +488,57 @@ const Community = () => {
 
   const handleAddComment = async (postId) => {
     const text = newComment[postId];
-    if (!text?.trim() || !user) return;
+    if (!text?.trim()) return;
+
+    const commentObject = {
+      id: `local-c-${Date.now()}`,
+      author: profile?.full_name || 'Guest Gardener',
+      avatar: profile?.avatar_url || '🌱',
+      text: text,
+      time: 'Just now',
+      likes: 0,
+      created_at: new Date().toISOString()
+    };
+
+    const isLocalPost = String(postId).startsWith('local-p-') || typeof postId === 'number' || String(postId).startsWith('mock-');
 
     try {
-      const { error } = await supabase
-        .from('community_comments')
-        .insert([{
-          post_id: postId,
-          user_id: user.id,
-          author_name: profile?.full_name || 'Gardener',
-          author_avatar: profile?.avatar_url || '🌱',
-          content: text
-        }]);
+      if (isAuthenticated && user && !isLocalPost) {
+        const { error } = await supabase
+          .from('community_comments')
+          .insert([{
+            post_id: postId,
+            user_id: user.id,
+            author_name: profile?.full_name || 'Gardener',
+            author_avatar: profile?.avatar_url || '🌱',
+            content: text
+          }]);
 
-      if (error) throw error;
+        if (error) throw error;
+      } else {
+        saveCommentLocally(postId, commentObject);
+      }
       setNewComment(prev => ({ ...prev, [postId]: '' }));
       fetchPosts();
     } catch (err) {
-      console.error('Error adding comment:', err.message);
+      console.error('Error adding comment, saving locally:', err.message);
+      saveCommentLocally(postId, commentObject);
+      setNewComment(prev => ({ ...prev, [postId]: '' }));
+      fetchPosts();
+    }
+  };
+
+  const saveCommentLocally = (postId, commentObj) => {
+    try {
+      const localCommentsStr = localStorage.getItem('community_comments_local') || '{}';
+      const localComments = JSON.parse(localCommentsStr);
+      if (!localComments[postId]) {
+        localComments[postId] = [];
+      }
+      localComments[postId].push(commentObj);
+      localStorage.setItem('community_comments_local', JSON.stringify(localComments));
+    } catch (err) {
+      console.error('Error saving comment locally:', err);
     }
   };
 

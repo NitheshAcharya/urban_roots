@@ -130,6 +130,34 @@ const Marketplace = () => {
   });
   const [isSubmittingBarter, setIsSubmittingBarter] = useState(false);
 
+  const handleLoadTemplate = (type) => {
+    if (type === 'seeds') {
+      setNewBarter({
+        itemOffered: '25 Organic Butterhead Lettuce Seeds',
+        itemWanted: 'Cherry Tomato seeds or Mint cuttings',
+        description: 'Fresh seeds harvested from my hydroponic grow tower. High germination rate (>90%). Looking for a direct swap in Bengaluru.',
+        contactInfo: 'priya.sharma@gardeners.in / 9845011223',
+        zone: 'Bengaluru'
+      });
+    } else if (type === 'cutting') {
+      setNewBarter({
+        itemOffered: '3 rooted Italian Basil cuttings',
+        itemWanted: 'Free / Gifting',
+        description: 'Potted and rooted basil cuttings, ready to plant. Sourced from high-yielding mother plant. Free pickup.',
+        contactInfo: 'karthik.reddy@mysoregrow.org',
+        zone: 'Mysuru'
+      });
+    } else if (type === 'harvest') {
+      setNewBarter({
+        itemOffered: '1.5 kg fresh Organic Spinach (Palak)',
+        itemWanted: 'Lemongrass slips or Curry leaf stem',
+        description: 'Freshly cut spinach leaves from my balcony garden. Harvested today. Happy to swap for lemongrass slips or curry leaf cuttings.',
+        contactInfo: 'anjali.mng@gmail.com / 9123456789',
+        zone: 'Mangaluru'
+      });
+    }
+  };
+
   useEffect(() => {
     if (profile?.city) {
       // Set default zone for barter modal based on user profile
@@ -655,6 +683,33 @@ const Marketplace = () => {
                 </div>
 
                 <div className="modal-body-barter">
+                  <div className="template-helper-row">
+                    <span className="template-label-text">Quick Example Templates:</span>
+                    <div className="template-buttons">
+                      <button 
+                        type="button" 
+                        className="template-pill-btn" 
+                        onClick={() => handleLoadTemplate('seeds')}
+                      >
+                        🥬 Seed Swap
+                      </button>
+                      <button 
+                        type="button" 
+                        className="template-pill-btn" 
+                        onClick={() => handleLoadTemplate('cutting')}
+                      >
+                        ✂️ Plant Cutting
+                      </button>
+                      <button 
+                        type="button" 
+                        className="template-pill-btn" 
+                        onClick={() => handleLoadTemplate('harvest')}
+                      >
+                        🍓 Excess Harvest
+                      </button>
+                    </div>
+                  </div>
+
                   <div className="form-row-barter">
                     <div className="form-group-barter">
                       <label>What item do you have in excess?</label>
