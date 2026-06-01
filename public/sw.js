@@ -1,4 +1,4 @@
-const CACHE_NAME = 'urbanroots-cache-v1';
+const CACHE_NAME = 'urbanroots-cache-v2';
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
@@ -32,13 +32,35 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// Fetch Event (Cache First / Stale While Revalidate)
+// Fetch Event
 self.addEventListener('fetch', (event) => {
   // Only intercept HTTP/S GET requests (avoid chrome-extension:// or POST requests)
   if (!event.request.url.startsWith(self.location.origin) || event.request.method !== 'GET') {
     return;
   }
 
+  const url = new URL(event.request.url);
+
+  // Network First for HTML and navigation routes (including '/' and '/index.html')
+  if (event.request.mode === 'navigate' || url.pathname === '/' || url.pathname.endsWith('.html')) {
+    event.respondWith(
+      fetch(event.request)
+        .then((networkResponse) => {
+          if (networkResponse.status === 200) {
+            const responseToCache = networkResponse.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, responseToCache));
+          }
+          return networkResponse;
+        })
+        .catch(() => {
+          // Fallback to cache if offline
+          return caches.match('/index.html') || caches.match(event.request);
+        })
+    );
+    return;
+  }
+
+  // Stale-While-Revalidate for other static assets (JS, CSS, images, etc.)
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
       if (cachedResponse) {
