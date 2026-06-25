@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { supabase } from '../utils/supabase';
+import { supabase, isSupabaseConfigured } from '../utils/supabase';
 import { Mail, Lock, User, MapPin, ArrowRight, Leaf, Eye, EyeOff } from 'lucide-react';
 import './Auth.css';
 
@@ -109,6 +109,14 @@ const Auth = () => {
           <h2 className="auth-heading">
             {isLogin ? 'Welcome back, Gardener!' : 'Join the community'}
           </h2>
+
+          {!isSupabaseConfigured && (
+            <div className="auth-error" style={{ backgroundColor: '#fff3cd', color: '#856404', borderColor: '#ffeeba', padding: '15px', borderRadius: '8px', marginBottom: '20px', fontSize: '0.875rem', lineHeight: '1.4' }}>
+              <strong>⚠️ Database Connection Error:</strong> Supabase has not been configured on Vercel yet. 
+              Please add <code>VITE_SUPABASE_URL</code> and <code>VITE_SUPABASE_ANON_KEY</code> to your Vercel project environment variables and redeploy. 
+              Localhost works because it reads them from your local <code>.env</code> file.
+            </div>
+          )}
 
           {error && <div className="auth-error">{error}</div>}
           {successMsg && <div className="auth-success">{successMsg}</div>}
