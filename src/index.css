@@ -52,6 +52,8 @@
   --color-blue: #70a1ff;
   --color-gray: #747d8c;
   --color-gray-dark: #2f3542;
+
+  --gradient-primary: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
 }
 
 /* Dark Mode Variables Override */
